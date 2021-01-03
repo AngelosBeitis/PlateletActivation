@@ -1,0 +1,4 @@
+
+command="processing-java --sketch=$(pwd) --run"
+eval $command
+
