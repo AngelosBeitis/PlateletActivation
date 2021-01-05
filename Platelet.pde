@@ -1,19 +1,41 @@
 class Platelet extends BloodCont{
 	
+	boolean activated;
+	
 	Platelet(PVector l, float ms, float mf) {
+		
 		super(l,ms,mf,2.5);
+		activated = false;
 	}
 	
 	boolean scan(Damage d) {
 		float distance = dist(position.x,position.y,d.position.x,d.position.y);
-		boolean withinDist = distance < 30;
-		
-		if (distance < 30) {
-			moveTo(d.position.x,d.position.y);
-			if (distance < 2)
+		boolean withinDist = distance < 40;
+		float moveX = d.position.x;
+		float moveY = d.position.y;
+		if (distance < 40) {
+			moveTo(random(d.left.x, d.right.x), random(d.top.y, d.bottom.y));
+			if (distance < 10)
 				activate();
 		}
 		return withinDist;
+		
+	}
+	
+	boolean scanForActivated(List<Platelet> platelets) {
+		
+		float distance;
+		for (Platelet p : platelets) {
+			distance = dist(position.x,position.y,p.position.x,p.position.y);
+			if (p.activated == true && activated == false && distance < height / 1.5) {
+				moveTo(p.position.x,p.position.y);
+				if (distance < 2)
+					activate();
+				return true;
+			}
+		}
+		
+		return false;
 		
 	}
 	
@@ -24,8 +46,8 @@ class Platelet extends BloodCont{
 		float d = desired.mag();
 		desired.normalize();
 		
-		if (d < 1) {
-			float m = map(d,0,1,0,maxspeed);
+		if (d < 10) {
+			float m = map(d,0,10,0,maxspeed);
 			desired.mult(m);
 			
 		} else {
@@ -39,6 +61,8 @@ class Platelet extends BloodCont{
 	
 	void activate() {
 		activated = true;
+		velocity = new PVector(0,0);
+		acceleration = new PVector(0,0);
 		
 	}
 	@Override

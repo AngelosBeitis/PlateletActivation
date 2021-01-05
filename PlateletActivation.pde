@@ -18,7 +18,7 @@ void setup() {
 	flowfield = new FlowField(20);
 	rbcs = new ArrayList<Rbc>();
 	platelets = new ArrayList<Platelet>();
-	damage = new Damage(350,15,20);
+	damage = new Damage(350,15,50);
 }
 
 void draw() {
@@ -34,8 +34,10 @@ void draw() {
 	// Tell all the vehicles to follow the flow field
 	for (Rbc r : rbcs) {
 		r.follow(flowfield);
-		
 		r.checkBoundary();
+		for (Platelet p : platelets) {
+			r.stickTo(p);
+		}
 		r.run();
 	}
 	for (int i = rbcs.size() - 1; i>= 0;i--) {
@@ -49,8 +51,12 @@ void draw() {
 		
 		if (p.scan(damage) == true) {
 			
-		} else{
-			p.follow(flowfield);
+		} else if (p.scanForActivated(platelets) == true) {
+			p.scan(damage);
+		}
+		else{
+			if (p.activated == false)
+				p.follow(flowfield);
 		}
 		p.checkBoundary();
 		p.run();
@@ -67,14 +73,14 @@ void draw() {
 	rbcs.add(new Rbc(new PVector(width, random(10,height - 20)), 2, 0.4));
 	
 	if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
-		platelets.add(new Platelet(new PVector(width, random(1,5)), random(1.0,2.0), 0.4));
-		platelets.add(new Platelet(new PVector(width, random(height - 10,height)), random(1.0,2.0), 0.4));
+		platelets.add(new Platelet(new PVector(width, random(1,height / 2)), random(1.0,2.0), 0.4));
+		platelets.add(new Platelet(new PVector(width, random(height - 100,height)), 2, 0.4));
 		currentTime = millis() / 1000;
 		flag = 1;
 	}
 	if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
-		platelets.add(new Platelet(new PVector(width, random(1,5)), random(1.0,2.0), 0.4));
-		platelets.add(new Platelet(new PVector(width, random(height - 10,height)), random(1.0,2.0), 0.4));
+		platelets.add(new Platelet(new PVector(width, random(1,height / 2)), 2, 0.4));
+		platelets.add(new Platelet(new PVector(width, random(height - height / 2,height)), 2, 0.4));
 		currentTime = millis() / 1000;
 		flag = 0;
 	}
@@ -100,6 +106,21 @@ void heartBeat() {
 		flag = 0;
 	}
 	
+}
+
+void mouseClicked() {
+	int stuck = 0;
+	int activated = 0;
+	for (Platelet p : platelets) {
+		if (p.activated) 
+			activated++;
+	}
+	for (Rbc r : rbcs) {
+		if (r.stuck)
+			stuck++;
+	}
+	print("Stuck: " + stuck + "\n");
+	print("Activated: " + activated + "\n");
 }
 
 

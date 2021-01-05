@@ -52,11 +52,11 @@ class FlowField {
 	
 	// Draw every vector
 	void display() {
-		for (int i = 0; i < cols; i++) {
-			for (int j = 0; j < rows; j++) {
-				drawVector(field[i][j],i * resolution,j * resolution,resolution - 2);
-			}
-		}
+		// for (int i = 0; i < cols; i++) {
+		// 	for (int j = 0; j < rows; j++) {
+		// 		drawVector(field[i][j],i * resolution,j * resolution,resolution - 2);
+		// 	}
+		// }
 		fill(213,110,110);
 		ellipse(width / 2,height - 5,width,20);
 		fill(213,110,110);

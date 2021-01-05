@@ -1,7 +1,10 @@
 class Rbc extends BloodCont{
 	
+	boolean stuck;
+	
 	Rbc(PVector l, float ms, float mf) {
 		super(l,ms,mf,5);
+		stuck = false;
 	}
 	@Override
 	void display() {
@@ -9,6 +12,15 @@ class Rbc extends BloodCont{
 		fill(255,0,0);
 		stroke(0);
 		ellipse(position.x,position.y,radius * 2,radius * 2);
+	}
+	
+	void stickTo(Platelet p) {
+		
+		if (p.activated == true && dist(position.x,position.y,p.position.x,p.position.y)<2) {
+			velocity = new PVector(0,0);
+			acceleration = new PVector(0,0);
+			stuck = true;
+		}
 	}
 	
 	

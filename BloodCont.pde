@@ -8,13 +8,11 @@ abstract class BloodCont{
 	float maxforce;    // Maximum steering force
 	float maxspeed;    // Maximum speed
 	float radius;
-	boolean activated;
 	
 	BloodCont(PVector l, float ms, float mf,float rad) {
 		position = l.get();
 		r = 3.0;
 		maxspeed = ms;
-		activated = false;
 		radius = rad;
 		maxforce = mf;
 		acceleration = new PVector(0,0);
@@ -60,8 +58,8 @@ abstract class BloodCont{
 		
 		if (position.y > height - radius - 15) {
 			position.y = height - radius - 15;
-		} else if (position.y < radius + 15) {
-			position.y = radius + 15;
+		} else if (position.y < radius) {
+			position.y = radius;
 		}
 	}
 }
