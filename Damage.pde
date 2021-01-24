@@ -4,6 +4,8 @@ class Damage{
     int size;
     int x;
     int y;
+    float width;
+    float height;
     PVector top;
     PVector bottom;
     PVector left;
@@ -15,11 +17,13 @@ class Damage{
         bottom = new PVector(x1,position.y + (size / 8));
         left = new PVector(position.x - size / 2 ,y1);
         right = new PVector(position.x + size / 2,y1);
+        width = dist(left.x,left.y,right.x,right.y);
+        height = dist(top.x,top.y,bottom.x,bottom.y);
     }
     
     void display() {
         fill(73,70,70);
-        ellipse(position.x,position.y,size,size / 4);
+        ellipse(position.x,position.y,width,height);
         
     }
     

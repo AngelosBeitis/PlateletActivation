@@ -12,12 +12,12 @@ class Platelet extends BloodCont{
         float newX = random(d.left.x, d.right.x);
         float newY = random(d.top.y, d.bottom.y);
         float distance = dist(position.x,position.y,newX,newY);
-        boolean withinDist = distance < 40;
+        boolean withinDist = distance < d.width;
         float moveX = d.position.x;
         float moveY = d.position.y;
-        if (distance < 40) {
+        if (withinDist) {
             moveTo(newX, newY);
-            if (distance < 5)
+            if (distance <= 1)
                 activate();
         }
         return withinDist;
@@ -29,7 +29,7 @@ class Platelet extends BloodCont{
         float distance;
         for (Protein p : proteins) {
             distance = dist(position.x,position.y,p.position.x,p.position.y);
-            if (!activated && distance < height / 1.5) {
+            if (!activated && distance < 10) {
                 moveTo(p.position.x,p.position.y);
                 return true;
             }
@@ -46,8 +46,8 @@ class Platelet extends BloodCont{
         float d = desired.mag();
         desired.normalize();
         
-        if (d < 10) {
-            float m = map(d,0,10,0,maxspeed);
+        if (d < 50) {
+            float m = map(d,0,100,0,maxspeed);
             desired.mult(m);
             
         } else{

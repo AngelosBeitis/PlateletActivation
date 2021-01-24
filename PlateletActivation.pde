@@ -85,7 +85,8 @@ void draw() {
     }
     
     for (Protein prot : proteins) {
-        prot.follow(flowfield);
+        if (dist(prot.position.x,prot.position.y,damage.position.x,damage.position.y)>50)
+            prot.follow(flowfield);
         prot.checkBoundary();
         prot.run();
         
