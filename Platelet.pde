@@ -1,6 +1,7 @@
 class Platelet extends BloodCont{
     
     boolean activated;
+    PVector positionInDamage;
     
     Platelet(PVector l, float ms, float mf) {
         
@@ -8,29 +9,32 @@ class Platelet extends BloodCont{
         activated = false;
     }
     
-    boolean scan(Damage d) {
-        float newX = random(d.left.x, d.right.x);
-        float newY = random(d.top.y, d.bottom.y);
-        float distance = dist(position.x,position.y,newX,newY);
-        boolean withinDist = distance < d.width;
+    boolean scan(Damage d, FlowField flow) {
+        if (positionInDamage == null) {
+            float newX = random(d.left.x, d.right.x);
+            float newY = random(d.top.y, d.bottom.y);
+            positionInDamage = new PVector(newX,newY);
+        }
+        float distance = dist(position.x,position.y,positionInDamage.x,positionInDamage.y);
+        boolean withinDist = distance < 20;
         float moveX = d.position.x;
         float moveY = d.position.y;
         if (withinDist) {
-            moveTo(newX, newY);
-            if (distance <= 1)
+            moveTo(positionInDamage.x, positionInDamage.y,flow);
+            if (distance <= 2)
                 activate();
         }
         return withinDist;
         
     }
     
-    boolean scanForProteins(List<Protein> proteins) {
+    boolean scanForProteins(List<Protein> proteins,FlowField flow) {
         
         float distance;
         for (Protein p : proteins) {
             distance = dist(position.x,position.y,p.position.x,p.position.y);
             if (!activated && distance < 10) {
-                moveTo(p.position.x,p.position.y);
+                moveTo(p.position.x,p.position.y,flow);
                 return true;
             }
         }
@@ -39,21 +43,18 @@ class Platelet extends BloodCont{
         
     }
     
-    void moveTo(float x,float y) {
+    void moveTo(float x,float y,FlowField flow) {
         
         PVector target = new PVector(x,y);
         PVector desired = PVector.sub(target,position);
         float d = desired.mag();
         desired.normalize();
-        
-        if (d < 50) {
-            float m = map(d,0,100,0,maxspeed);
-            desired.mult(m);
-            
-        } else{
-            desired.mult(maxspeed);
-        }
+        float speed = positionSpeed();
+        float m = map(d,0,20,0.5,1);
+        desired.mult(m);
+        PVector flowVelocity = flowVelocity(flow);
         PVector steer = PVector.sub(desired,velocity);
+        steer.add(flowVelocity);
         steer.limit(maxforce);
         applyForce(steer);
         
@@ -66,7 +67,6 @@ class Platelet extends BloodCont{
     }
     @Override
     void display() {
-        // Draw a triangle rotated in the direction of velocity
         if (!activated) {
             fill(255);
             stroke(0);

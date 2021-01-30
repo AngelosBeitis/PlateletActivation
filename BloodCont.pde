@@ -25,7 +25,7 @@ abstract class BloodCont{
         // What is the vector at that spot in the flow field?
         PVector desired = flow.lookup(position);
         // Scale it up by maxspeed
-        desired.mult(maxspeed);
+        desired.mult(positionSpeed());
         // Steering is desired minus velocity
         PVector steer = PVector.sub(desired, velocity);
         steer.limit(maxforce);  // Limit to maximum steering force
@@ -58,8 +58,25 @@ abstract class BloodCont{
         
         if (position.y > height - radius - 15) {
             position.y = height - radius - 15;
-        } else if (position.y < radius) {
-            position.y = radius;
+        } else if (position.y < 15 + radius && (position.x < damage.left.x || position.x > damage.right.x)) {
+            position.y = 15 + radius;
         }
+    }
+    PVector flowVelocity(FlowField flow) {
+        PVector flowVelocity = flow.lookup(position);
+        if (position.y >= height / 2)
+            flowVelocity.mult(positionSpeed());
+        else
+            flowVelocity.mult(positionSpeed());
+        
+        return flowVelocity;     
+    }
+    
+    float positionSpeed() {
+        if (position.y >= height / 2)
+            return map(position.y,height / 2,height - 15 - radius ,maxspeed,0);
+        else
+            return map(position.y,15 + radius,height / 2,0,maxspeed);
+        
     }
 }

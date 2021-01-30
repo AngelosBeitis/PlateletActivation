@@ -9,19 +9,30 @@ List<Rbc> rbcs;
 List<Platelet> platelets;
 List<Protein> proteins;
 Damage damage;
+Platelet tempPlatelet;
 int flag = 0;
+int flag2 = 0;
 int currentTime = millis() / 1000;
 int currentTime2 = millis() / 1000;
+float maxSpeed = 10;
+float maxForce = 0.4;
 
 void setup() {
     frameRate(60);
     size(640, 340);
-    // Make a new flow field with "resolution" of 16
-    flowfield = new FlowField(20);
+    // Make a new flow field with "resolution" of 20
+    flowfield = new FlowField(20,5,10);
     rbcs = new ArrayList<Rbc>();
     platelets = new ArrayList<Platelet>();
     proteins = new ArrayList<Protein>();
-    damage = new Damage(350,15,50);
+    
+    for (int i = 0;i < 500;i++) {
+        rbcs.add(new Rbc(new PVector(random(0,width), random(10,height - 20)), maxSpeed, maxForce));  
+    }
+    for (int i = 0;i < 2;i++) {
+        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
+        
+    }
 }
 
 void draw() {
@@ -32,7 +43,7 @@ void draw() {
     flowfield.display();
     damage.display(); 
     // Tell all the vehicles to follow the flow field
-    for (Rbc r : rbcs) {
+    for (Rbc r : rbcs) {        
         r.follow(flowfield);
         r.checkBoundary();
         for (Platelet p : platelets) {
@@ -48,30 +59,37 @@ void draw() {
     }
     
     for (Platelet p : platelets) {
-        
-        if (p.scan(damage)) {
+        if (p.scan(damage,flowfield)) {
             
-        } else if (p.scanForProteins(proteins)) {
-            p.scan(damage);
+        }
+        else if (p.scanForProteins(proteins,flowfield)) {
+            p.scan(damage,flowfield);;
         }
         else{
             if (!p.activated)
                 p.follow(flowfield);
         }
-        if (p.activated) {
-            if ((millis() / 1000) - currentTime2 >= 1 && flag == 0) {
-                proteins.add(new Protein(new PVector(p.position.x,p.position.y),0.5,0.1));
-                currentTime2 = millis() / 1000;
-                flag = 1;
+        
+        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
+            for (Platelet i : platelets) {
+                if (i.activated) {
+                    for (int j = 0;j < 3;j++)
+                        proteins.add(new Protein(new PVector(i.position.x,i.position.y),maxSpeed, maxForce));
+                }
             }
-            if ((millis() / 1000) - currentTime2 >= 1 && flag == 1) {
-                proteins.add(new Protein(new PVector(p.position.x,p.position.y),0.5,0.1));
-                currentTime2 = millis() / 1000;
-                flag = 0;
-            }
+            currentTime2 = millis() / 1000;
+            flag2 = 1;
         }
-        
-        
+        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 1) {
+            for (Platelet i : platelets) {
+                if (i.activated) {
+                    for (int j = 0;j < 3;j++)
+                        proteins.add(new Protein(new PVector(i.position.x,i.position.y),maxSpeed, maxForce));
+                }
+            }
+            currentTime2 = millis() / 1000;
+            flag2 = 0;
+        }
         p.checkBoundary();
         p.run();
         
@@ -85,8 +103,8 @@ void draw() {
     }
     
     for (Protein prot : proteins) {
-        if (dist(prot.position.x,prot.position.y,damage.position.x,damage.position.y)>50)
-            prot.follow(flowfield);
+        //if (dist(prot.position.x,prot.position.y,damage.position.x,damage.position.y)>random(10,300))
+        prot.follow(flowfield);
         prot.checkBoundary();
         prot.run();
         
@@ -100,18 +118,20 @@ void draw() {
         
     }
     // add red blood cells at a random height but at the right of the screen
-    rbcs.add(new Rbc(new PVector(width, random(10,height - 20)), 2, 0.4));
+    rbcs.add(new Rbc(new PVector(width, random(10,height - 20)), maxSpeed,  maxForce));
+    rbcs.add(new Rbc(new PVector(width, random(10,height - 20)), maxSpeed,  maxForce));
+    
     
     // add platelets everey 5 seconds
     if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
-        platelets.add(new Platelet(new PVector(width, random(1,height / 2)), 2, 0.1));
-        platelets.add(new Platelet(new PVector(width, random(height - 100,height)), 2, 0.1));
+        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
         currentTime = millis() / 1000;
         flag = 1;
     }
     if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
-        platelets.add(new Platelet(new PVector(width, random(1,height / 2)), 2, 0.1));
-        platelets.add(new Platelet(new PVector(width, random(height - height / 2,height)), 2, 0.1));
+        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
         currentTime = millis() / 1000;
         flag = 0;
     }
@@ -157,6 +177,11 @@ void mouseClicked() {
     }
     print("Stuck: " + stuck + "\n");
     print("Activated: " + activated + "\n");
+    print("Proteins:" + proteins.size() + "\n");
+    print("Platelets:" + platelets.size() + "\n");
+    print("red blood cells:" + rbcs.size() + "\n");
+    
+    
+    
 }
-
 

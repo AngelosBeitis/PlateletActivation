@@ -16,7 +16,7 @@ class Rbc extends BloodCont{
     
     void stickTo(Platelet p) {
         
-        if (p.activated == true && dist(position.x,position.y,p.position.x,p.position.y) < 4) {
+        if (p.activated == true && dist(position.x,position.y,p.position.x,p.position.y) < 2) {
             velocity = new PVector(0,0);
             acceleration = new PVector(0,0);
             stuck = true;
@@ -29,7 +29,7 @@ class Rbc extends BloodCont{
             // Get distances between the balls components
             PVector distanceVect = PVector.sub(other.position, position);
             
-            float m = radius *.1;
+            float m = radius * .1;
             
             // Calculate magnitude of the vector separating the balls
             float distanceVectMag = distanceVect.mag();

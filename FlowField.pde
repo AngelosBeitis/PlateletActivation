@@ -4,15 +4,19 @@ class FlowField {
     PVector[][] field;
     int cols, rows; // Columns and Rows
     int resolution; // How large is each "cell" of the flow field
-    
+    int missing;
     float zoff = 0.0; // 3rd dimension of noise
+    int cells;
     
-    FlowField(int r) {
+    FlowField(int r,int m,int c) {
         resolution = r;
         // Determine the number of columns and rows based on sketch's width and height
         cols = width / resolution;
         rows = height / resolution;
         field = new PVector[cols][rows];
+        missing = m;
+        cells = c;
+        
         init();
     }
     
@@ -24,8 +28,8 @@ class FlowField {
         for (int i = 0; i < cols; i++) {
             float yoff = 0;
             for (int j = 0; j < rows; j++) {
-                theta = noise(xoff,yoff,zoff) + PI / 1.2;
-                //theta = PI/4;
+                //theta = noise(xoff,yoff,zoff) + PI / 1.2;
+                theta = PI;
                 //Polar to cartesian coordinate transformation to get x and y components of the vector
                 field[i][j] = new PVector(cos(theta),sin(theta));
                 yoff += 0.1;
@@ -39,7 +43,8 @@ class FlowField {
         for (int i = 0; i < cols; i++) {
             float yoff = 0;
             for (int j = 0; j < rows; j++) {
-                theta = map(noise(xoff,yoff,zoff),0,1,PI / 1.1,PI * 1.1);
+                //theta = map(noise(xoff,yoff,zoff),0,1,PI / 1.1,PI * 1.1);
+                theta = PI;
                 //Make a vector from an angle
                 field[i][j] = PVector.fromAngle(theta);
                 yoff += 0.1;
@@ -52,15 +57,36 @@ class FlowField {
     
     // Draw every vector
     void display() {
-        // for(int i = 0; i < cols; i++) {
-        // 	for (int j = 0; j < rows; j++) {
-        // 		drawVector(field[i][j],i * resolution,j * resolution,resolution - 2);
-    //	}
-    //}
-        fill(213,110,110);
-        ellipse(width / 2,height - 5,width,20);
-        fill(213,110,110);
-        ellipse(width / 2,5,width,20);
+        
+        //drawFlow();
+        drawWalls();
+        
+    }
+    void drawWalls() {
+        float start = 0;
+        float end = width / cells;
+        for (int i = 0;i <= cells;i++) {
+            
+            if (i == missing) {
+                damage = new Damage(start,start + (width / cells),0,15);
+                rect(start, height - 15, end , 15, 7);
+                start +=  width / cells; 
+                
+            } else{
+                fill(213,110,110);
+                rect(start,0,end,15,7);
+                fill(213,110,110);
+                rect(start, height - 15, end , 15, 7);
+                start += width / cells;
+            }
+        }
+    }
+    void drawFlow() {
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
+                drawVector(field[i][j],i * resolution,j * resolution,resolution - 2);
+            }
+        }
     }
     
     // Renders a vector object 'v' as an arrow and a position 'x,y'
