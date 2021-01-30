@@ -11,12 +11,12 @@ class Platelet extends BloodCont{
     
     boolean scan(Damage d, FlowField flow) {
         if (positionInDamage == null) {
-            float newX = random(d.left.x, d.right.x);
+            float newX = random(d.left.x + 7, d.right.x - 7);
             float newY = random(d.top.y, d.bottom.y);
             positionInDamage = new PVector(newX,newY);
         }
         float distance = dist(position.x,position.y,positionInDamage.x,positionInDamage.y);
-        boolean withinDist = distance < 20;
+        boolean withinDist = distance < 40;
         float moveX = d.position.x;
         float moveY = d.position.y;
         if (withinDist) {
@@ -28,13 +28,17 @@ class Platelet extends BloodCont{
         
     }
     
-    boolean scanForProteins(List<Protein> proteins,FlowField flow) {
+    boolean scanForProteins(FlowField flow) {
         
         float distance;
         for (Protein p : proteins) {
             distance = dist(position.x,position.y,p.position.x,p.position.y);
             if (!activated && distance < 10) {
                 moveTo(p.position.x,p.position.y,flow);
+                if (distance < 2) {
+                    proteins.remove(p);
+                    scanForProteins(flow);
+                }
                 return true;
             }
         }
@@ -51,6 +55,7 @@ class Platelet extends BloodCont{
         desired.normalize();
         float speed = positionSpeed();
         float m = map(d,0,20,0.5,1);
+        //float m = 1;
         desired.mult(m);
         PVector flowVelocity = flowVelocity(flow);
         PVector steer = PVector.sub(desired,velocity);

@@ -30,6 +30,8 @@ class FlowField {
             for (int j = 0; j < rows; j++) {
                 //theta = noise(xoff,yoff,zoff) + PI / 1.2;
                 theta = PI;
+                if (yoff < 3)
+                    theta = 120;
                 //Polar to cartesian coordinate transformation to get x and y components of the vector
                 field[i][j] = new PVector(cos(theta),sin(theta));
                 yoff += 0.1;
@@ -45,6 +47,8 @@ class FlowField {
             for (int j = 0; j < rows; j++) {
                 //theta = map(noise(xoff,yoff,zoff),0,1,PI / 1.1,PI * 1.1);
                 theta = PI;
+                if (j < 1)
+                    theta = - PI / 2;
                 //Make a vector from an angle
                 field[i][j] = PVector.fromAngle(theta);
                 yoff += 0.1;
@@ -58,7 +62,7 @@ class FlowField {
     // Draw every vector
     void display() {
         
-        //drawFlow();
+        drawFlow();
         drawWalls();
         
     }

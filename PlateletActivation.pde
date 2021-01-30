@@ -21,7 +21,7 @@ void setup() {
     frameRate(60);
     size(640, 340);
     // Make a new flow field with "resolution" of 20
-    flowfield = new FlowField(20,5,10);
+    flowfield = new FlowField(20,5,20);
     rbcs = new ArrayList<Rbc>();
     platelets = new ArrayList<Platelet>();
     proteins = new ArrayList<Protein>();
@@ -29,7 +29,7 @@ void setup() {
     for (int i = 0;i < 500;i++) {
         rbcs.add(new Rbc(new PVector(random(0,width), random(10,height - 20)), maxSpeed, maxForce));  
     }
-    for (int i = 0;i < 2;i++) {
+    for (int i = 0;i < 100;i++) {
         platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
         
     }
@@ -62,7 +62,7 @@ void draw() {
         if (p.scan(damage,flowfield)) {
             
         }
-        else if (p.scanForProteins(proteins,flowfield)) {
+        else if (p.scanForProteins(flowfield)) {
             p.scan(damage,flowfield);;
         }
         else{
@@ -96,7 +96,7 @@ void draw() {
     }
     for (int i = platelets.size() - 1; i>= 0;i--) {
         BloodCont p = platelets.get(i);
-        if (p.position.x < 0 - p.radius) {
+        if (p.position.x < 0 - p.radius || p.position.y > height + p.radius || p.position.y < 0 - p.radius) {
             platelets.remove(i);
         }
         

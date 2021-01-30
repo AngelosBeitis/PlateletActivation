@@ -58,9 +58,18 @@ abstract class BloodCont{
         
         if (position.y > height - radius - 15) {
             position.y = height - radius - 15;
-        } else if (position.y < 15 + radius && (position.x < damage.left.x || position.x > damage.right.x)) {
+        } else if (position.y < 15 + radius && (position.x < damage.left.x - radius || position.x > damage.right.x + radius)) {
             position.y = 15 + radius;
+        } else if (position.x < damage.left.x - radius && position.y > height - radius - 15) {
+            position.x = damage.left.x - radius;
+        } else if (position.x > damage.right.x + radius && position.y > height - radius - 15) {
+            position.x = damage.right.x + radius;
+        } else if (position.x < damage.left.x + radius && position.y < 15 + radius) {
+            position.x = damage.left.x + radius;
+        } else if (position.x > damage.right.x + radius && position.y < 15 + radius) {
+            position.x = damage.right.x + radius;
         }
+        
     }
     PVector flowVelocity(FlowField flow) {
         PVector flowVelocity = flow.lookup(position);
@@ -73,6 +82,9 @@ abstract class BloodCont{
     }
     
     float positionSpeed() {
+        if (position.y < 15 + radius || position.y > height - radius - 15) {
+            return maxspeed / 4;
+        }
         if (position.y >= height / 2)
             return map(position.y,height / 2,height - 15 - radius ,maxspeed,0);
         else
