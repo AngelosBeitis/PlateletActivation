@@ -21,7 +21,7 @@ class Damage{
         height = dist(top.x,top.y,bottom.x,bottom.y);
     }
     
-    void display() {
+    public void display() {
         
         //fill(73,70,70);
         noFill();

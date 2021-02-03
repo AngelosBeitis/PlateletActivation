@@ -20,7 +20,29 @@ class FlowField {
         init();
     }
     
-    void init() {
+    public void pull() {
+        
+        for (Platelet p : platelets) {
+            if (dist(damage.top.x,damage.top.y,p.position.x,p.position.y)<100) {
+                p.moveTo(damage.top.x,damage.top.y + p.radius,flowfield,false);
+            }
+            
+        }
+        for (Protein p : proteins) {
+            if (dist(damage.top.x,damage.top.y,p.position.x,p.position.y)<100) {
+                p.moveTo(damage.top.x,damage.top.y + p.radius,flowfield,false);
+            }
+            
+        }
+        for (Rbc r : rbcs) {
+            if (dist(damage.top.x,damage.top.y,r.position.x,r.position.y)<100) {
+                r.moveTo(damage.top.x,damage.top.y + r.radius,flowfield,false);
+            }
+            
+        }
+    }
+    
+    public void init() {
         // Reseed noise so we get a new flow field every time
         noiseSeed((int)random(10000));
         float xoff = 0;
@@ -39,7 +61,7 @@ class FlowField {
             xoff += 0.1;
         }
     }
-    void update() {
+    public void update() {
         float xoff = 0;
         float theta;
         for (int i = 0; i < cols; i++) {
@@ -60,27 +82,38 @@ class FlowField {
     }
     
     // Draw every vector
-    void display() {
+    public void display() {
         
-        drawFlow();
+        //drawFlow();
         drawWalls();
         
     }
     void drawWalls() {
         float start = 0;
         float end = width / cells;
+        fill(213,110,110);
+        rect(0,0,width,15);
+        fill(213,110,110);
+        rect(0,height - 15,width,15);
         for (int i = 0;i <= cells;i++) {
             
             if (i == missing) {
-                damage = new Damage(start,start + (width / cells),0,15);
-                rect(start, height - 15, end , 15, 7);
+                damage = new Damage(start,start + (width / cells),15,30);
+                fill(255,255,0);
+                rect(start, height - 30, end , 15, 7);
+                fill(0,0,0);
+                ellipse(damage.position.x,(height - (45 / 2)) ,10,5);
                 start +=  width / cells; 
                 
             } else{
-                fill(213,110,110);
-                rect(start,0,end,15,7);
-                fill(213,110,110);
-                rect(start, height - 15, end , 15, 7);
+                fill(255,255,0);
+                rect(start,15,end,15,7);
+                fill(0,0,0);
+                ellipse((start + (end / 2)),(45 / 2) ,10,5);
+                fill(255,255,0);
+                rect(start, height - 30, end , 15, 7);
+                fill(0,0,0);
+                ellipse((start + (end / 2)),(height - (45 / 2)) ,10,5);
                 start += width / cells;
             }
         }
@@ -94,7 +127,7 @@ class FlowField {
     }
     
     // Renders a vector object 'v' as an arrow and a position 'x,y'
-    void drawVector(PVector v, float x, float y, float scayl) {
+    public void drawVector(PVector v, float x, float y, float scayl) {
         pushMatrix();
         float arrowsize = 1;
         // Translate to position to render vector
@@ -111,7 +144,7 @@ class FlowField {
         popMatrix();
     }
     
-    PVector lookup(PVector lookup) {
+    public PVector lookup(PVector lookup) {
         int column = int(constrain(lookup.x / resolution,0,cols - 1));
         int row = int(constrain(lookup.y / resolution,0,rows - 1));
         return field[column][row].get();

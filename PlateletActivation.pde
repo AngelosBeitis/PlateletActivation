@@ -26,11 +26,12 @@ void setup() {
     platelets = new ArrayList<Platelet>();
     proteins = new ArrayList<Protein>();
     
+    
     for (int i = 0;i < 500;i++) {
-        rbcs.add(new Rbc(new PVector(random(0,width), random(10,height - 20)), maxSpeed, maxForce));  
+        rbcs.add(new Rbc(new PVector(random(0,width), random(35,height - 35)), maxSpeed, maxForce));  
     }
     for (int i = 0;i < 100;i++) {
-        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(random(0,width), random(32.5,height - 32.5)), maxSpeed,  maxForce));
         
     }
 }
@@ -42,10 +43,15 @@ void draw() {
     // Display the flowfield in "debug" mode
     flowfield.display();
     damage.display(); 
+    //flowfield.pull();
+    
+    
     // Tell all the vehicles to follow the flow field
     for (Rbc r : rbcs) {        
         r.follow(flowfield);
         r.checkBoundary();
+        // r.checkCollision(rbcs);
+        // r.checkCollision(platelets);
         for (Platelet p : platelets) {
             r.stickTo(p);
         }
@@ -53,7 +59,7 @@ void draw() {
     }
     for (int i = rbcs.size() - 1; i>= 0;i--) {
         BloodCont r = rbcs.get(i);
-        if (r.position.x < 0 - r.radius) {
+        if (r.position.x < 0 - r.radius || r.position.y > height + r.radius || r.position.y < 0 - r.radius) {
             rbcs.remove(i);
         }
     }
@@ -90,6 +96,7 @@ void draw() {
             currentTime2 = millis() / 1000;
             flag2 = 0;
         }
+        p.checkCollision(platelets);
         p.checkBoundary();
         p.run();
         
@@ -112,26 +119,26 @@ void draw() {
     }
     for (int i = proteins.size() - 1; i>= 0;i--) {
         BloodCont prot = proteins.get(i);
-        if (prot.position.x < 0 - prot.radius) {
+        if (prot.position.x < 0 - prot.radius || prot.position.y > height + prot.radius || prot.position.y < 0 - prot.radius) {
             proteins.remove(i);
         }
         
     }
     // add red blood cells at a random height but at the right of the screen
-    rbcs.add(new Rbc(new PVector(width, random(10,height - 20)), maxSpeed,  maxForce));
-    rbcs.add(new Rbc(new PVector(width, random(10,height - 20)), maxSpeed,  maxForce));
+    rbcs.add(new Rbc(new PVector(width, random(35,height - 35)), maxSpeed,  maxForce));
+    rbcs.add(new Rbc(new PVector(width, random(35,height - 35)), maxSpeed,  maxForce));
     
     
     // add platelets everey 5 seconds
     if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
-        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
-        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(width, random(32.5,height - 32.5)), maxSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(width, random(32.5,height - 32.5)), maxSpeed,  maxForce));
         currentTime = millis() / 1000;
         flag = 1;
     }
     if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
-        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
-        platelets.add(new Platelet(new PVector(width, random(0,height)), maxSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(width, random(32.5,height - 32.5)), maxSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(width, random(32.5,height - 32.5)), maxSpeed,  maxForce));
         currentTime = millis() / 1000;
         flag = 0;
     }

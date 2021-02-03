@@ -3,12 +3,12 @@ class Protein extends BloodCont{
     Protein(PVector l, float ms, float mf) {
         
         super(l,ms,mf,2.5);      
-        acceleration.add(random(- 50,100),random(0,100));
+        acceleration.add(random( - 50,100),random(0,100));
         //velocity.add(100,100);
     }
     
     @Override
-    void display() {
+    public void display() {
         
         float theta = velocity.heading2D() + radians(90);
         fill(0,255,0);

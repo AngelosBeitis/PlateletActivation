@@ -9,10 +9,10 @@ class Platelet extends BloodCont{
         activated = false;
     }
     
-    boolean scan(Damage d, FlowField flow) {
+    public boolean scan(Damage d, FlowField flow) {
         if (positionInDamage == null) {
             float newX = random(d.left.x + 7, d.right.x - 7);
-            float newY = random(d.top.y, d.bottom.y);
+            float newY = d.top.y + 2.5;
             positionInDamage = new PVector(newX,newY);
         }
         float distance = dist(position.x,position.y,positionInDamage.x,positionInDamage.y);
@@ -20,7 +20,7 @@ class Platelet extends BloodCont{
         float moveX = d.position.x;
         float moveY = d.position.y;
         if (withinDist) {
-            moveTo(positionInDamage.x, positionInDamage.y,flow);
+            moveTo(positionInDamage.x, positionInDamage.y,flow,true);
             if (distance <= 2)
                 activate();
         }
@@ -28,13 +28,13 @@ class Platelet extends BloodCont{
         
     }
     
-    boolean scanForProteins(FlowField flow) {
+    public boolean scanForProteins(FlowField flow) {
         
         float distance;
         for (Protein p : proteins) {
             distance = dist(position.x,position.y,p.position.x,p.position.y);
             if (!activated && distance < 10) {
-                moveTo(p.position.x,p.position.y,flow);
+                moveTo(p.position.x,p.position.y,flow,true);
                 if (distance < 2) {
                     proteins.remove(p);
                     scanForProteins(flow);
@@ -47,31 +47,14 @@ class Platelet extends BloodCont{
         
     }
     
-    void moveTo(float x,float y,FlowField flow) {
-        
-        PVector target = new PVector(x,y);
-        PVector desired = PVector.sub(target,position);
-        float d = desired.mag();
-        desired.normalize();
-        float speed = positionSpeed();
-        float m = map(d,0,20,0.5,1);
-        //float m = 1;
-        desired.mult(m);
-        PVector flowVelocity = flowVelocity(flow);
-        PVector steer = PVector.sub(desired,velocity);
-        steer.add(flowVelocity);
-        steer.limit(maxforce);
-        applyForce(steer);
-        
-    }
     
-    void activate() {
+    public void activate() {
         activated = true;
         maxspeed = 0;
         
     }
     @Override
-    void display() {
+    public void display() {
         if (!activated) {
             fill(255);
             stroke(0);
@@ -108,6 +91,4 @@ class Platelet extends BloodCont{
             popMatrix();
         }
     }
-    
-    
 }
