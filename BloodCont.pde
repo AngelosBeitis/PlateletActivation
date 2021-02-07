@@ -4,16 +4,14 @@ abstract class BloodCont{
     PVector position;
     PVector velocity;
     PVector acceleration;
-    float r;
     float maxforce;    // Maximum steering force
-    float maxspeed;    // Maximum speed
+    float speed;    // Maximum speed
     float radius;
     float currentSpeed;
     
-    BloodCont(PVector l, float ms, float mf,float rad) {
+    BloodCont(PVector l, float s, float mf,float rad) {
         position = l.get();
-        r = 3.0;
-        maxspeed = ms;
+        speed = s;
         radius = rad;
         maxforce = mf;
         acceleration = new PVector(0,0);
@@ -29,7 +27,7 @@ abstract class BloodCont{
         desired.mult(positionSpeed());
         // Steering is desired minus velocity
         PVector steer = PVector.sub(desired, velocity);
-        steer.limit(maxforce);  // Limit to maximum steering force
+        steer.limit(maxForce);  // Limit to maximum steering force
         applyForce(steer);
     }
     public void run() {
@@ -38,11 +36,11 @@ abstract class BloodCont{
     }
     
     // Method to update position
-    public void update() {
+    private void update() {
         // Update velocity
         velocity.add(acceleration);
         // Limit speed
-        velocity.limit(maxspeed);
+        velocity.limit(flowfield.maxSpeed);
         position.add(velocity);
         // Reset accelertion to 0 each cycle
         acceleration.mult(0);
@@ -88,8 +86,8 @@ abstract class BloodCont{
         }
         
     }
-    public PVector flowVelocity(FlowField flow) {
-        PVector flowVelocity = flow.lookup(position);
+    public PVector flowVelocity() {
+        PVector flowVelocity = flowfield.lookup(position);
         if (position.y >= height / 2)
             flowVelocity.mult(positionSpeed());
         else
@@ -101,17 +99,17 @@ abstract class BloodCont{
     public float positionSpeed() {
         
         if (position.y >= height / 2)
-            currentSpeed = map(position.y,height / 2,height - 30 - radius ,maxspeed,0);
+            currentSpeed = map(position.y,height / 2,height - 30 - radius ,flowfield.maxSpeed,0);
         else
-            currentSpeed = map(position.y,30 + radius,height / 2,0,maxspeed);
+            currentSpeed = map(position.y,30 + radius,height / 2,0,flowfield.maxSpeed);
         
-        if (position.y < 30 || position.y > height - 30) {
+        if (position.y <= 30 || position.y >= height - 30) {
             currentSpeed = 0;
         }
         return currentSpeed;
     }
     
-    public void moveTo(float x,float y,FlowField flow,boolean flag) {
+    public void moveTo(float x,float y,boolean flag) {
         
         PVector target = new PVector(x,y);
         PVector desired = PVector.sub(target,position);
@@ -123,10 +121,10 @@ abstract class BloodCont{
             m = map(d,0,20,0,0.5);
         //m = 2;
         else
-            m = map(d,0,100,maxSpeed,currentSpeed);
+            m = map(d,0,100,flowfield.maxSpeed,currentSpeed);
         //float m = 1;
         desired.mult(m);
-        PVector flowVelocity = flowVelocity(flow);
+        PVector flowVelocity = flowVelocity();
         PVector steer = PVector.sub(desired,velocity);
         steer.add(flowVelocity);
         steer.limit(maxforce);

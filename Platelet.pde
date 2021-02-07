@@ -9,7 +9,7 @@ class Platelet extends BloodCont{
         activated = false;
     }
     
-    public boolean scan(Damage d, FlowField flow) {
+    public boolean scan(Damage d) {
         if (positionInDamage == null) {
             float newX = random(d.left.x + 7, d.right.x - 7);
             float newY = d.top.y + 2.5;
@@ -20,7 +20,7 @@ class Platelet extends BloodCont{
         float moveX = d.position.x;
         float moveY = d.position.y;
         if (withinDist) {
-            moveTo(positionInDamage.x, positionInDamage.y,flow,true);
+            moveTo(positionInDamage.x, positionInDamage.y,true);
             if (distance <= 2)
                 activate();
         }
@@ -28,16 +28,16 @@ class Platelet extends BloodCont{
         
     }
     
-    public boolean scanForProteins(FlowField flow) {
+    public boolean scanForProteins() {
         
         float distance;
         for (Protein p : proteins) {
             distance = dist(position.x,position.y,p.position.x,p.position.y);
             if (!activated && distance < 10) {
-                moveTo(p.position.x,p.position.y,flow,true);
+                moveTo(p.position.x,p.position.y,true);
                 if (distance < 2) {
                     proteins.remove(p);
-                    scanForProteins(flow);
+                    scanForProteins();
                 }
                 return true;
             }
@@ -50,7 +50,7 @@ class Platelet extends BloodCont{
     
     public void activate() {
         activated = true;
-        maxspeed = 0;
+        currentSpeed = 0;
         
     }
     @Override

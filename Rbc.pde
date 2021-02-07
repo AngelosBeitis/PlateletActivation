@@ -22,7 +22,7 @@ class Rbc extends BloodCont{
         }
     }
     
-    // void checkCollision(ArrayList<Rbc> others) {
+    // public void checkCollision(ArrayList<Rbc> others) {
     //     for (Rbc other : others) {
     
     //         // Get distances between the balls components
@@ -42,7 +42,7 @@ class Rbc extends BloodCont{
     //             PVector correctionVector = d.normalize().mult(distanceCorrection);
     //             other.position.add(correctionVector);
     //             position.sub(correctionVector);
-       
+      
     //         }
     //     }
 //}

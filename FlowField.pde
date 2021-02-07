@@ -7,8 +7,9 @@ class FlowField {
     int missing;
     float zoff = 0.0; // 3rd dimension of noise
     int cells;
+    float maxSpeed;
     
-    FlowField(int r,int m,int c) {
+    FlowField(int r,int m,int c,float max) {
         resolution = r;
         // Determine the number of columns and rows based on sketch's width and height
         cols = width / resolution;
@@ -16,6 +17,7 @@ class FlowField {
         field = new PVector[cols][rows];
         missing = m;
         cells = c;
+        maxSpeed = max;
         
         init();
     }
@@ -24,19 +26,19 @@ class FlowField {
         
         for (Platelet p : platelets) {
             if (dist(damage.top.x,damage.top.y,p.position.x,p.position.y)<100) {
-                p.moveTo(damage.top.x,damage.top.y + p.radius,flowfield,false);
+                p.moveTo(damage.top.x,damage.top.y + p.radius,false);
             }
             
         }
         for (Protein p : proteins) {
             if (dist(damage.top.x,damage.top.y,p.position.x,p.position.y)<100) {
-                p.moveTo(damage.top.x,damage.top.y + p.radius,flowfield,false);
+                p.moveTo(damage.top.x,damage.top.y + p.radius,false);
             }
             
         }
         for (Rbc r : rbcs) {
             if (dist(damage.top.x,damage.top.y,r.position.x,r.position.y)<100) {
-                r.moveTo(damage.top.x,damage.top.y + r.radius,flowfield,false);
+                r.moveTo(damage.top.x,damage.top.y + r.radius,false);
             }
             
         }
@@ -148,6 +150,10 @@ class FlowField {
         int column = int(constrain(lookup.x / resolution,0,cols - 1));
         int row = int(constrain(lookup.y / resolution,0,rows - 1));
         return field[column][row].get();
+    }
+    
+    public void changeSpeed(float speed) {
+        this.maxSpeed = speed;
     }
     
     
