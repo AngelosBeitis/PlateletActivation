@@ -21,14 +21,15 @@ int currentTime3 = millis() / 1000;
 float maxSpeed = 10;
 float contentSpeed = 1;
 float maxForce = 0.6;
+int amounts = 2;
 
 void setup() {
     //size(330,260);
     
     controlP5 = new ControlP5(this);
     
-    controlP5.addSlider("slider1",0,10,128,70,80,100,10);
-    controlP5.addSlider("slider2",0,20,128,70,100,100,10);
+    // controlP5.addSlider("slider1",0,50,128,70,80,100,10).setValue(amounts);
+    // controlP5.addSlider("slider2",0,20,128,70,100,100,10).setValue(maxSpeed);
     
     
     frameRate(60);
@@ -39,13 +40,20 @@ void setup() {
     platelets = new ArrayList<Platelet>();
     proteins = new ArrayList<Protein>();
     
-    
+    flowfield.display();
+
     for (int i = 0;i < 500;i++) {
         rbcs.add(new Rbc(new PVector(random(0,width), random(35,height - 35)), contentSpeed, maxForce));  
     }
-    for (int i = 0;i < 100;i++) {
-        platelets.add(new Platelet(new PVector(random(0,width), random(32.5,height - 32.5)), contentSpeed,  maxForce));
+    for (int i = 0;i < 5;i++) {
+        platelets.add(new Platelet(new PVector(random(0,width), random(height-35,height - 32.5)), contentSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(random(0,width), random(32.5,50)), contentSpeed,  maxForce));
         
+    }
+    for (int i=0; i<20;i++){
+        float x = random(damage.left.x + 7, damage.right.x - 7);
+        float y = random(damage.top.y,damage.bottom.y);
+        proteins.add(new Protein(new PVector(x,y),contentSpeed,maxForce));
     }
 }
 
@@ -94,7 +102,7 @@ void draw() {
             for (Platelet i : platelets) {
                 if (i.activated) {
                     for (int j = 0;j < 3;j++)
-                        proteins.add(new Protein(new PVector(i.position.x,i.position.y),random(4,10), maxForce));
+                        proteins.add(new Protein(new PVector(i.position.x,i.position.y),5, maxForce));
                 }
             }
             currentTime2 = millis() / 1000;
@@ -104,13 +112,13 @@ void draw() {
             for (Platelet i : platelets) {
                 if (i.activated) {
                     for (int j = 0;j < 3;j++)
-                        proteins.add(new Protein(new PVector(i.position.x,i.position.y),random(4,10), maxForce));
+                        proteins.add(new Protein(new PVector(i.position.x,i.position.y),5, maxForce));
                 }
             }
             currentTime2 = millis() / 1000;
             flag2 = 0;
         }
-        p.checkCollision(platelets);
+        p.checkCollision();
         p.checkBoundary();
         p.run();
         
@@ -143,14 +151,18 @@ void draw() {
     
     // add platelets everey 5 seconds
     if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
-        for (int i = 0;i < 5;i++)
-            platelets.add(new Platelet(new PVector(width, random(32.5,height - 32.5)), contentSpeed,  maxForce));
+        for (int i = 0;i < amounts;i++){
+            platelets.add(new Platelet(new PVector(width, random(height-35,height - 32.5)), contentSpeed,  maxForce));
+            platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
+        }
         currentTime = millis() / 1000;
         flag = 1;
     }
     if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
-        for (int i = 0;i < 5;i++)
-            platelets.add(new Platelet(new PVector(width, random(32.5,height - 32.5)), contentSpeed,  maxForce));
+        for (int i = 0;i < amounts;i++){
+            platelets.add(new Platelet(new PVector(width, random(height-35,height - 32.5)), contentSpeed,  maxForce));
+            platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
+        }
         currentTime = millis() / 1000;
         flag = 0;
     }
@@ -208,7 +220,7 @@ void controlEvent(ControlEvent theEvent) {
     if (theEvent.isController()) { 
         
         if (theEvent.getController().getName() == "slider1") {
-            
+            amounts = round(theEvent.getController().getValue());
         }
         if (theEvent.getController().getName() == "slider2") {
             maxSpeed = theEvent.getController().getValue();

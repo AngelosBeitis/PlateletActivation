@@ -9,9 +9,17 @@ class Rbc extends BloodCont{
     @Override
     public void display() {
         float theta = velocity.heading2D() + radians(90);
-        fill(255,0,0);
         stroke(0);
-        ellipse(position.x,position.y,radius * 2,radius * 2);
+        pushMatrix();
+        PShape rbc = createShape(GROUP);
+
+        PShape body = createShape(ELLIPSE,position.x,position.y, this.radius*2, this.radius*2);
+        PShape inner = createShape(ELLIPSE,position.x,position.y, this.radius, this.radius);
+        fill(255,0,0);
+        rbc.addChild(body);
+        rbc.addChild(inner);
+        shape(rbc);
+        popMatrix();
     }
     public void stickTo(Platelet p) {
         
@@ -28,13 +36,13 @@ class Rbc extends BloodCont{
     //         // Get distances between the balls components
     //         PVector distanceVect = PVector.sub(other.position, position);
     
-    //         float m = radius * .1;
+    //         float m =this.radius * .1;
     
     //         // Calculate magnitude of the vector separating the balls
     //         float distanceVectMag = distanceVect.mag();
     
     //         // Minimum distance before they are touching
-    //         float minDistance = radius + other.radius;
+    //         float minDistance =this.radius + other.radius;
     
     //         if (distanceVectMag < minDistance) {
     //             float distanceCorrection = (minDistance - distanceVectMag) / 2.0;
