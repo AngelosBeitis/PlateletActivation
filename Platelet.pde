@@ -27,8 +27,8 @@ class Platelet extends BloodCont{
     //             activate();
     //     }
     //     return withinDist;
-      
-  // }
+    
+// }
     @Override
     public void update() {
         // Update velocity
@@ -45,7 +45,7 @@ class Platelet extends BloodCont{
     }
     
     // public boolean scanForProteins() {
-       
+    
     //     float distance;
     //     for (Protein p : proteins) {
     //         distance = dist(position.x,position.y,p.position.x,p.position.y);
@@ -58,10 +58,10 @@ class Platelet extends BloodCont{
     //             return true;
     //         }
     //     }
-       
+    
     //     return false;
-       
-   // }
+    
+// }
     
     
     public void activate() {
@@ -75,7 +75,8 @@ class Platelet extends BloodCont{
         if (!activated) {
             fill(255);
             stroke(0);
-            ellipse(position.x,position.y,this.radius * 2,this.radius * 2);
+            //ellipse(position.x,position.y,this.radius * 2,this.radius * 2);
+            setShape(createShape(RECT,position.x,position.y,100,50));
         }
         else{
             float theta = velocity.heading2D() + radians(90);
@@ -113,8 +114,8 @@ class Platelet extends BloodCont{
             if (this.activated || o.activated) {
                 // Get distances between the balls components
                 PVector distanceVect = PVector.sub(o.position, position);
-                float m = this.radius *.1;
-                float m2 = o.radius * .1;
+                float m = this.radius * .1;
+                float m2 = o.radius *.1;
                 
                 
                 // Calculate magnitude of the vector separating the balls

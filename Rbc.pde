@@ -12,13 +12,13 @@ class Rbc extends BloodCont{
         stroke(0);
         pushMatrix();
         PShape rbc = createShape(GROUP);
-
-        PShape body = createShape(ELLIPSE,position.x,position.y, this.radius*2, this.radius*2);
+        
+        PShape body = createShape(ELLIPSE,position.x,position.y, this.radius * 2, this.radius * 2);
         PShape inner = createShape(ELLIPSE,position.x,position.y, this.radius, this.radius);
         fill(255,0,0);
         rbc.addChild(body);
         rbc.addChild(inner);
-        shape(rbc);
+        setShape(rbc);
         popMatrix();
     }
     public void stickTo(Platelet p) {
@@ -50,7 +50,7 @@ class Rbc extends BloodCont{
     //             PVector correctionVector = d.normalize().mult(distanceCorrection);
     //             other.position.add(correctionVector);
     //             position.sub(correctionVector);
-      
+     
     //         }
     //     }
 //}

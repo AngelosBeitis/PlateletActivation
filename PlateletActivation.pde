@@ -14,7 +14,7 @@ Fluid fluid;
 // An ArrayList of vehicles
 List<Rbc> rbcs;
 PGraphics2D pg_fluid;
-
+PGraphics2D pg_obstacles;
 List<Platelet> platelets;
 List<Protein> proteins;
 Damage damage;
@@ -35,14 +35,14 @@ PApplet papplet;
 void setup() {
     //size(330,260);
     
-    controlP5 = new ControlP5(this);
+    //controlP5 = new ControlP5(this);
     
     // controlP5.addSlider("slider1",0,50,128,70,80,100,10).setValue(amounts);
     // controlP5.addSlider("slider2",0,20,128,70,100,100,10).setValue(maxSpeed);
     
     
     
-    frameRate(120);
+    //frameRate(120);
     size(640, 340,P2D);
     DwPixelFlow context = new DwPixelFlow(this);
     fluid = new Fluid(context, 640, 340, 1);
@@ -59,13 +59,15 @@ void setup() {
             float py     = height / 2 - 30;
             float vx     = - 100;
             float vy     = 0;
-            for (int i = 0;i < height / 2 - 60;i++) {
-                fluid.addVelocity(px, py - i, 14, vx, vy);
-                fluid.addDensity(px, py - i, 20, 1.0f, 1.0f, 1.0f, 1.0f);
-            }
+            fluid.addVelocity(px, py , 14, vx, vy);
+            fluid.addDensity(px, py , 20, 1.0f, 1.0f, 1.0f, 1.0f);
+            
             
         }
     });
+    
+    
+    
     
     // Make a new flow field with "resolution" of 20
     flowfield = new FlowField(20,5,20,maxSpeed);
@@ -95,22 +97,21 @@ void setup() {
 void draw() {
     
     background(255,252,182);
-    flowfield.update();
-    fluid.update();
+    //flowfield.update();
+    //fluid.update();
     
-    pg_fluid.beginDraw();
-    pg_fluid.background(0);
-    pg_fluid.endDraw();
-    fluid.renderFluidTextures(pg_fluid, 0);
+    // pg_fluid.beginDraw();
+    // pg_fluid.background(0);
+    // pg_fluid.endDraw();
+    //fluid.renderFluidTextures(pg_fluid, 0);
     
+    print(frameRate + "\n");
     
-    
-    
-    image(pg_fluid, 0, 0);
+    //image(pg_fluid, 0, 0);
     
     // Display the flowfield in "debug" mode
-    flowfield.display();
-    damage.display(); 
+    //flowfield.display();
+    //damage.display(); 
     //flowfield.pull();
     //heartBeat();
     
@@ -192,27 +193,27 @@ void draw() {
         
     }
     // add red blood cells at a random height but at the right of the screen
-    rbcs.add(new Rbc(new PVector(width, random(35,height - 35)), contentSpeed,  maxForce));
-    rbcs.add(new Rbc(new PVector(width, random(35,height - 35)), contentSpeed,  maxForce));
+    // rbcs.add(new Rbc(new PVector(width, random(35,height - 35)), contentSpeed,  maxForce));
+    // rbcs.add(new Rbc(new PVector(width, random(35,height - 35)), contentSpeed,  maxForce));
     
     
-    // add platelets everey 5 seconds
-    if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
-        for (int i = 0;i < amounts;i++) {
-            platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5)), contentSpeed,  maxForce));
-            platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
-        }
-        currentTime = millis() / 1000;
-        flag = 1;
-    }
-    if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
-        for (int i = 0;i < amounts;i++) {
-            platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5)), contentSpeed,  maxForce));
-            platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
-        }
-        currentTime = millis() / 1000;
-        flag = 0;
-    }
+    // // add platelets everey 5 seconds
+    // if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
+    //     for (int i = 0;i < amounts;i++) {
+    //         platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5)), contentSpeed,  maxForce));
+    //         platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
+    //     }
+    //     currentTime = millis() / 1000;
+    //     flag = 1;
+// }
+    // if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
+    //     for (int i = 0;i < amounts;i++) {
+    //         platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5)), contentSpeed,  maxForce));
+    //         platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
+    //     }
+    //     currentTime = millis() / 1000;
+    //     flag = 0;
+// }
     fill(0);
     
 }
