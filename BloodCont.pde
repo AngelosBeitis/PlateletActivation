@@ -9,7 +9,6 @@ abstract class BloodCont extends DwParticle2D{
     float radius;
     float currentSpeed;
     boolean activated;
-    float[] fluid_velocity;
     
     BloodCont(PVector l, float s, float mf,float rad) {
         super(1,l.x,l.y,rad);
@@ -32,15 +31,11 @@ abstract class BloodCont extends DwParticle2D{
     //     PVector steer = PVector.sub(desired, velocity);
     //     steer.limit(maxForce);  // Limit to maximum steering force
     //     applyForce(steer);
- // }
-    public void run() {
-        update();
-        display();
-    }
+// }
+    
     
     // Method to update position
-    public void update() {
-        fluid_velocity = fluid.getVelocity(fluid_velocity);
+    public void update(float[] fluid_velocity) {
         
         // add force: FLuid Velocity
         float[] fluid_vxy = new float[2];
@@ -72,7 +67,7 @@ abstract class BloodCont extends DwParticle2D{
         acceleration.add(force);
     }
     
-    abstract void display();
+    abstract void display(PGraphics pg);
     
     public void checkBoundary() {
         //bottom boundary
@@ -131,7 +126,7 @@ abstract class BloodCont extends DwParticle2D{
     }
     
     // public void moveTo(float x,float y,boolean flag) {
-      
+    
     //     PVector target = new PVector(x,y);
     //     float distance = dist(position.x,position.y,x,y);
     //     PVector desired = PVector.sub(target,position);
@@ -151,8 +146,8 @@ abstract class BloodCont extends DwParticle2D{
     //     steer.add(flowVelocity);
     //     steer.limit(maxforce);
     //     applyForce(steer);
-      
-  // }
+    
+// }
     
     
 }

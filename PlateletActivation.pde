@@ -14,9 +14,9 @@ Fluid fluid;
 // An ArrayList of vehicles
 List<Rbc> rbcs;
 PGraphics2D pg_fluid;
-PGraphics2D pg_obstacles;
 List<Platelet> platelets;
 List<Protein> proteins;
+float[] fluid_velocity;
 Damage damage;
 Platelet tempPlatelet;
 int flag = 0;
@@ -30,6 +30,7 @@ float contentSpeed = 1;
 float maxForce = 0.6;
 int amounts = 2;
 PApplet papplet;
+PShape shapePlatelets;
 
 
 void setup() {
@@ -42,10 +43,12 @@ void setup() {
     
     
     
-    //frameRate(120);
+    frameRate(60);
     size(640, 340,P2D);
+    //fullScreen(P2D);
     DwPixelFlow context = new DwPixelFlow(this);
-    fluid = new Fluid(context, 640, 340, 1);
+    //print(displayHeight + " " + displayWidth + " " + height + " " + width + "\n");
+    fluid = new Fluid(context, width, height, 1);
     
     // some fluid parameters
     fluid.param.dissipation_velocity = 0.70f;
@@ -64,7 +67,7 @@ void setup() {
             
             
         }
-    });
+    } );
     
     
     
@@ -85,6 +88,9 @@ void setup() {
         platelets.add(new Platelet(new PVector(random(0,width), random(32.5,50)), contentSpeed,  maxForce));
         
     }
+    this.shapeMode(PConstants.CORNER);
+    shapePlatelets = this.createShape(PShape.GROUP);    
+    
     for (int i = 0; i < 20;i++) {
         float x = random(damage.left.x + 7, damage.right.x - 7);
         float y = random(damage.top.y,damage.bottom.y);
@@ -97,35 +103,41 @@ void setup() {
 void draw() {
     
     background(255,252,182);
-    //flowfield.update();
-    //fluid.update();
+    flowfield.update();
+    fluid.update();
+    fluid_velocity = fluid.getVelocity(fluid_velocity);
     
-    // pg_fluid.beginDraw();
-    // pg_fluid.background(0);
-    // pg_fluid.endDraw();
-    //fluid.renderFluidTextures(pg_fluid, 0);
+    pg_fluid.beginDraw();
+    pg_fluid.background(0);
+    pg_fluid.endDraw();
+    fluid.renderFluidTextures(pg_fluid, 0);
     
-    print(frameRate + "\n");
+    PGraphics pg = this.g;
+    //print(frameRate + "\n");
     
-    //image(pg_fluid, 0, 0);
+    image(pg_fluid, 0, 0);
     
     // Display the flowfield in "debug" mode
-    //flowfield.display();
-    //damage.display(); 
+    flowfield.display();
+    damage.display(); 
     //flowfield.pull();
     //heartBeat();
     
     // Tell all the vehicles to follow the flow field
     for (Rbc r : rbcs) {        
         //r.follow(flowfield);
-        r.checkBoundary();
+        //r.checkBoundary();
+        
         // r.checkCollision(rbcs);
         // r.checkCollision(platelets);
         // for (Platelet p : platelets) {
         //     r.stickTo(p);
     // }
-        r.run();
+        //r.update(fluid_velocity);
+        //r.display(pg);
     }
+    
+    
     for (int i = rbcs.size() - 1; i>= 0;i--) {
         BloodCont r = rbcs.get(i);
         if (r.position.x < 0 - r.radius || r.position.y > height + r.radius || r.position.y < 0 - r.radius) {
@@ -168,9 +180,12 @@ void draw() {
     // }
         // p.checkCollision();
         p.checkBoundary();
-        p.run();
+        shapePlatelets.addChild(p.getShape());
+        //p.update(fluid_velocity);
+        //p.display(pg);
         
     }
+    pg.shape(shapePlatelets);
     for (int i = platelets.size() - 1; i>= 0;i--) {
         BloodCont p = platelets.get(i);
         if (p.position.x < 0 - p.radius || p.position.y > height + p.radius || p.position.y < 0 - p.radius) {
@@ -183,7 +198,8 @@ void draw() {
         //if (dist(prot.position.x,prot.position.y,damage.position.x,damage.position.y)>random(10,300))
         //prot.follow(flowfield);
         prot.checkBoundary();
-        prot.run();
+        prot.update(fluid_velocity);
+        prot.display(pg);
     }
     for (int i = proteins.size() - 1; i>= 0;i--) {
         BloodCont prot = proteins.get(i);

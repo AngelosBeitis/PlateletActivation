@@ -7,7 +7,7 @@ class Rbc extends BloodCont{
         stuck = false;
     }
     @Override
-    public void display() {
+    public void display(PGraphics pg) {
         float theta = velocity.heading2D() + radians(90);
         stroke(0);
         pushMatrix();
@@ -19,6 +19,8 @@ class Rbc extends BloodCont{
         rbc.addChild(body);
         rbc.addChild(inner);
         setShape(rbc);
+        pg.shape(rbc);        
+        //shape(rbc);
         popMatrix();
     }
     public void stickTo(Platelet p) {
@@ -50,7 +52,7 @@ class Rbc extends BloodCont{
     //             PVector correctionVector = d.normalize().mult(distanceCorrection);
     //             other.position.add(correctionVector);
     //             position.sub(correctionVector);
-     
+    
     //         }
     //     }
 //}

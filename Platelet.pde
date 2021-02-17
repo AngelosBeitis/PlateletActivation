@@ -1,7 +1,9 @@
 class Platelet extends BloodCont{
     
-    boolean activated;
-    PVector positionInDamage;
+    public boolean activated;
+    public PVector positionInDamage;    
+    
+    
     
     Platelet(PVector l, float ms, float mf) {
         
@@ -10,27 +12,27 @@ class Platelet extends BloodCont{
     }
     
     // public boolean scan(Damage d) {
-    //     if (positionInDamage == null) {
-    //         float newX = random(d.left.x + 7, d.right.x - 7);
-    //         float newY = d.top.y + 2.5;
-    //         positionInDamage = new PVector(newX,newY);
+    //    if (positionInDamage == null) {
+    //        float newX = random(d.left.x + 7, d.right.x - 7);
+    //        float newY = d.top.y + 2.5;
+    //        positionInDamage = new PVector(newX,newY);
     //     }
-    //     float distance = dist(position.x,position.y,positionInDamage.x,positionInDamage.y);
-    //     distance = distance - this.radius;
-    //     boolean withinDist = distance < 10;
-    //     float moveX = d.position.x;
-    //     float moveY = d.position.y;
-    //     if (withinDist) {
-    //         moveTo(positionInDamage.x, positionInDamage.y,true);
-    //         //activate at the damaged area
-    //         if (distance < 0.2)
-    //             activate();
+    //    float distance = dist(position.x,position.y,positionInDamage.x,positionInDamage.y);
+    //    distance = distance - this.radius;
+    //    boolean withinDist = distance < 10;
+    //    float moveX = d.position.x;
+    //    float moveY = d.position.y;
+    //    if (withinDist) {
+    //        moveTo(positionInDamage.x, positionInDamage.y,true);
+    //        //activate at the damaged area
+    //        if (distance < 0.2)
+    //            activate();
     //     }
-    //     return withinDist;
+    //    return withinDist;
     
 // }
     @Override
-    public void update() {
+    public void update(float[] fluid_velocity) {
         // Update velocity
         if (!this.activated) {
             velocity.add(acceleration);
@@ -67,16 +69,17 @@ class Platelet extends BloodCont{
     public void activate() {
         activated = true;
         currentSpeed = 0;
-        this.radius = 4;
-        
+        this.radius = 4;     
     }
+    
     @Override
-    public void display() {
+    public void display(PGraphics pg) {
         if (!activated) {
             fill(255);
             stroke(0);
             //ellipse(position.x,position.y,this.radius * 2,this.radius * 2);
-            setShape(createShape(RECT,position.x,position.y,100,50));
+            PShape inactive = createShape(ELLIPSE,position.x,position.y,this.radius * 2,this.radius * 2);
+            setShape(inactive);
         }
         else{
             float theta = velocity.heading2D() + radians(90);
@@ -104,18 +107,19 @@ class Platelet extends BloodCont{
             
             
             // Draw the group
-            
-            shape(platelet);
+            setShape(platelet);
             popMatrix();
         }
+        
     }
+    
     public void checkCollision() {
         for (Platelet o : platelets) {
             if (this.activated || o.activated) {
                 // Get distances between the balls components
                 PVector distanceVect = PVector.sub(o.position, position);
-                float m = this.radius * .1;
-                float m2 = o.radius *.1;
+                float m = this.radius *.1;
+                float m2 = o.radius * .1;
                 
                 
                 // Calculate magnitude of the vector separating the balls

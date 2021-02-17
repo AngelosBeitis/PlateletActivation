@@ -3,11 +3,11 @@ class Protein extends BloodCont{
     Protein(PVector l, float ms, float mf) {
         
         super(l,ms,mf,1);      
-        velocity.add(random( - 50,100),random(0,100));
+        velocity.add(random(- 50,100),random(0,100));
     }
     
     @Override
-    public void display() {
+    public void display(PGraphics pg) {
         
         //float theta = velocity.heading2D() + radians(90);
         fill(0,255,0);
@@ -24,7 +24,7 @@ class Protein extends BloodCont{
     //     PVector steer = PVector.sub(desired, velocity);
     //     steer.limit(maxForce);  // Limit to maximum steering force
     //     applyForce(steer);
-       
-   // }
+    
+// }
     
 }
