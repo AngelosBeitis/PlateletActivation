@@ -22,28 +22,6 @@ class FlowField {
         init();
     }
     
-    public void pull() {
-        
-        for (Platelet p : platelets) {
-            if (dist(damage.top.x,damage.top.y,p.position.x,p.position.y)<100) {
-                p.moveTo(damage.top.x,damage.top.y + p.radius,false);
-            }
-            
-        }
-        for (Protein p : proteins) {
-            if (dist(damage.top.x,damage.top.y,p.position.x,p.position.y)<100) {
-                p.moveTo(damage.top.x,damage.top.y + p.radius,false);
-            }
-            
-        }
-        for (Rbc r : rbcs) {
-            if (dist(damage.top.x,damage.top.y,r.position.x,r.position.y)<100) {
-                r.moveTo(damage.top.x,damage.top.y + r.radius,false);
-            }
-            
-        }
-    }
-    
     public void init() {
         // Reseed noise so we get a new flow field every time
         noiseSeed((int)random(10000));

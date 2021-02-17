@@ -9,32 +9,32 @@ class Platelet extends BloodCont{
         activated = false;
     }
     
-    public boolean scan(Damage d) {
-        if (positionInDamage == null) {
-            float newX = random(d.left.x + 7, d.right.x - 7);
-            float newY = d.top.y + 2.5;
-            positionInDamage = new PVector(newX,newY);
-        }
-        float distance = dist(position.x,position.y,positionInDamage.x,positionInDamage.y);
-        distance = distance - this.radius;
-        boolean withinDist = distance < 10;
-        float moveX = d.position.x;
-        float moveY = d.position.y;
-        if (withinDist) {
-            moveTo(positionInDamage.x, positionInDamage.y,true);
-            //activate at the damaged area
-            if (distance < 0.2)
-                activate();
-        }
-        return withinDist;
-        
-    }
+    // public boolean scan(Damage d) {
+    //     if (positionInDamage == null) {
+    //         float newX = random(d.left.x + 7, d.right.x - 7);
+    //         float newY = d.top.y + 2.5;
+    //         positionInDamage = new PVector(newX,newY);
+    //     }
+    //     float distance = dist(position.x,position.y,positionInDamage.x,positionInDamage.y);
+    //     distance = distance - this.radius;
+    //     boolean withinDist = distance < 10;
+    //     float moveX = d.position.x;
+    //     float moveY = d.position.y;
+    //     if (withinDist) {
+    //         moveTo(positionInDamage.x, positionInDamage.y,true);
+    //         //activate at the damaged area
+    //         if (distance < 0.2)
+    //             activate();
+    //     }
+    //     return withinDist;
+      
+  // }
     @Override
     public void update() {
         // Update velocity
-        if(!this.activated){
+        if (!this.activated) {
             velocity.add(acceleration);
-            if(positionSpeed()==0)
+            if (positionSpeed() == 0)
                 velocity.limit(speed);
             else
                 velocity.limit(maxSpeed);
@@ -44,24 +44,24 @@ class Platelet extends BloodCont{
         }
     }
     
-    public boolean scanForProteins() {
-        
-        float distance;
-        for (Protein p : proteins) {
-            distance = dist(position.x,position.y,p.position.x,p.position.y);
-            if (!activated && distance < 10) {
-                moveTo(p.position.x,p.position.y,true);
-                if (distance < 2) {
-                    proteins.remove(p);
-                    scanForProteins();
-                }
-                return true;
-            }
-        }
-        
-        return false;
-        
-    }
+    // public boolean scanForProteins() {
+       
+    //     float distance;
+    //     for (Protein p : proteins) {
+    //         distance = dist(position.x,position.y,p.position.x,p.position.y);
+    //         if (!activated && distance < 10) {
+    //             moveTo(p.position.x,p.position.y,true);
+    //             if (distance < 2) {
+    //                 proteins.remove(p);
+    //                 scanForProteins();
+    //             }
+    //             return true;
+    //         }
+    //     }
+       
+    //     return false;
+       
+   // }
     
     
     public void activate() {
@@ -75,7 +75,7 @@ class Platelet extends BloodCont{
         if (!activated) {
             fill(255);
             stroke(0);
-            ellipse(position.x,position.y,this.radius*2,this.radius*2);
+            ellipse(position.x,position.y,this.radius * 2,this.radius * 2);
         }
         else{
             float theta = velocity.heading2D() + radians(90);
@@ -87,10 +87,10 @@ class Platelet extends BloodCont{
             PShape platelet = createShape(GROUP);
             
             // Make 4shapes
-            PShape body = createShape(ELLIPSE, 0, 0,this.radius*2,this.radius*2);
-            PShape leg1 = createShape(LINE, 0, -this.radius*2,this.radius / 8,this.radius*2);
-            PShape leg2 = createShape(LINE, 0, -this.radius*2 ,this.radius / 8,this.radius*2);
-            PShape leg3 = createShape(LINE, 0, -this.radius*2 ,this.radius / 8,this.radius*2);
+            PShape body = createShape(ELLIPSE, 0, 0,this.radius * 2,this.radius * 2);
+            PShape leg1 = createShape(LINE, 0, - this.radius * 2,this.radius / 8,this.radius * 2);
+            PShape leg2 = createShape(LINE, 0, - this.radius * 2 ,this.radius / 8,this.radius * 2);
+            PShape leg3 = createShape(LINE, 0, - this.radius * 2 ,this.radius / 8,this.radius * 2);
             body.fill(255);
             leg2.rotate(1);
             leg3.rotate(2);
@@ -110,10 +110,10 @@ class Platelet extends BloodCont{
     }
     public void checkCollision() {
         for (Platelet o : platelets) {
-            if(this.activated || o.activated){
+            if (this.activated || o.activated) {
                 // Get distances between the balls components
                 PVector distanceVect = PVector.sub(o.position, position);
-                float m =this.radius *.1;
+                float m = this.radius *.1;
                 float m2 = o.radius * .1;
                 
                 
@@ -127,24 +127,24 @@ class Platelet extends BloodCont{
                     float distanceCorrection = (minDistance - distanceVectMag) / 2.0;
                     PVector d = distanceVect.copy();
                     PVector correctionVector = d.normalize().mult(distanceCorrection);
-
-                    if (!o.activated){
+                    
+                    if (!o.activated) {
                         o.position.add(correctionVector);
-                        if(this.activated && o.withinDamage())
+                        if (this.activated && o.withinDamage())
                             o.activate();
                     }
-                    if (!this.activated){
+                    if (!this.activated) {
                         position.sub(correctionVector);
-                        if(o.activated && this.withinDamage()) 
+                        if (o.activated && this.withinDamage()) 
                             this.activate();
                     }
                 }
             }
         }
     }
-
-    public boolean withinDamage(){
-        if(position.y < damage.bottom.y && position.x > damage.left.x && position.x < damage.right.x)
+    
+    public boolean withinDamage() {
+        if (position.y < damage.bottom.y && position.x > damage.left.x && position.x < damage.right.x)
             return true;
         return false;
     }

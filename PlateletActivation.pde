@@ -1,13 +1,20 @@
 import java.util.List;
 import controlP5.*;
+import com.thomasdiewald.pixelflow.java.DwPixelFlow;
+import com.thomasdiewald.pixelflow.java.fluid.DwFluid2D;
+import com.thomasdiewald.pixelflow.java.softbodydynamics.DwPhysics;
+import com.thomasdiewald.pixelflow.java.softbodydynamics.particle.DwParticle2D;
 ControlP5 controlP5;
 
 boolean debug = true;
 color[] colors = new color[7]; 
 // Flowfield object
 FlowField flowfield;
+Fluid fluid;
 // An ArrayList of vehicles
 List<Rbc> rbcs;
+PGraphics2D pg_fluid;
+
 List<Platelet> platelets;
 List<Protein> proteins;
 Damage damage;
@@ -22,6 +29,8 @@ float maxSpeed = 10;
 float contentSpeed = 1;
 float maxForce = 0.6;
 int amounts = 2;
+PApplet papplet;
+
 
 void setup() {
     //size(330,260);
@@ -32,8 +41,32 @@ void setup() {
     // controlP5.addSlider("slider2",0,20,128,70,100,100,10).setValue(maxSpeed);
     
     
-    frameRate(60);
-    size(640, 340);
+    
+    frameRate(120);
+    size(640, 340,P2D);
+    DwPixelFlow context = new DwPixelFlow(this);
+    fluid = new Fluid(context, 640, 340, 1);
+    
+    // some fluid parameters
+    fluid.param.dissipation_velocity = 0.70f;
+    fluid.param.dissipation_density  = 0.99f;
+    
+    //adding data to the fluid simulation
+    fluid.addCallback_FluiData(new  DwFluid2D.FluidData() {
+        public void update(DwFluid2D fluid) {
+            
+            float px     = width / 2;
+            float py     = height / 2 - 30;
+            float vx     = - 100;
+            float vy     = 0;
+            for (int i = 0;i < height / 2 - 60;i++) {
+                fluid.addVelocity(px, py - i, 14, vx, vy);
+                fluid.addDensity(px, py - i, 20, 1.0f, 1.0f, 1.0f, 1.0f);
+            }
+            
+        }
+    });
+    
     // Make a new flow field with "resolution" of 20
     flowfield = new FlowField(20,5,20,maxSpeed);
     rbcs = new ArrayList<Rbc>();
@@ -41,26 +74,39 @@ void setup() {
     proteins = new ArrayList<Protein>();
     
     flowfield.display();
-
+    
     for (int i = 0;i < 500;i++) {
         rbcs.add(new Rbc(new PVector(random(0,width), random(35,height - 35)), contentSpeed, maxForce));  
     }
     for (int i = 0;i < 5;i++) {
-        platelets.add(new Platelet(new PVector(random(0,width), random(height-35,height - 32.5)), contentSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(random(0,width), random(height - 35,height - 32.5)), contentSpeed,  maxForce));
         platelets.add(new Platelet(new PVector(random(0,width), random(32.5,50)), contentSpeed,  maxForce));
         
     }
-    for (int i=0; i<20;i++){
+    for (int i = 0; i < 20;i++) {
         float x = random(damage.left.x + 7, damage.right.x - 7);
         float y = random(damage.top.y,damage.bottom.y);
         proteins.add(new Protein(new PVector(x,y),contentSpeed,maxForce));
     }
+    pg_fluid = (PGraphics2D) createGraphics(width, height, P2D);
+    
 }
 
 void draw() {
     
     background(255,252,182);
     flowfield.update();
+    fluid.update();
+    
+    pg_fluid.beginDraw();
+    pg_fluid.background(0);
+    pg_fluid.endDraw();
+    fluid.renderFluidTextures(pg_fluid, 0);
+    
+    
+    
+    
+    image(pg_fluid, 0, 0);
     
     // Display the flowfield in "debug" mode
     flowfield.display();
@@ -70,13 +116,13 @@ void draw() {
     
     // Tell all the vehicles to follow the flow field
     for (Rbc r : rbcs) {        
-        r.follow(flowfield);
+        //r.follow(flowfield);
         r.checkBoundary();
         // r.checkCollision(rbcs);
         // r.checkCollision(platelets);
-        for (Platelet p : platelets) {
-            r.stickTo(p);
-        }
+        // for (Platelet p : platelets) {
+        //     r.stickTo(p);
+    // }
         r.run();
     }
     for (int i = rbcs.size() - 1; i>= 0;i--) {
@@ -87,38 +133,39 @@ void draw() {
     }
     
     for (Platelet p : platelets) {
-        if (p.scan(damage)) {
-            
-        }
-        else if (p.scanForProteins()) {
-            p.scan(damage);;
-        }
-        else{
-            if (!p.activated)
-                p.follow(flowfield);
-        }
+        // if (p.scan(damage)) {
         
-        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
-            for (Platelet i : platelets) {
-                if (i.activated) {
-                    for (int j = 0;j < 3;j++)
-                        proteins.add(new Protein(new PVector(i.position.x,i.position.y),5, maxForce));
-                }
-            }
-            currentTime2 = millis() / 1000;
-            flag2 = 1;
-        }
-        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 1) {
-            for (Platelet i : platelets) {
-                if (i.activated) {
-                    for (int j = 0;j < 3;j++)
-                        proteins.add(new Protein(new PVector(i.position.x,i.position.y),5, maxForce));
-                }
-            }
-            currentTime2 = millis() / 1000;
-            flag2 = 0;
-        }
-        p.checkCollision();
+    // }
+        // else if (p.scanForProteins()) {
+        //     p.scan(damage);;
+    // }
+        // else{
+        //     if (!p.activated)
+        //         //p.follow(flowfield);
+        //        ;
+        //    }
+        
+        //    if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
+        //        for (Platelet i : platelets) {
+        //            if (i.activated) {
+        //                for (int j = 0;j < 3;j++)
+        //                    proteins.add(new Protein(new PVector(i.position.x,i.position.y),5, maxForce));
+        //            }
+        //     }
+        //     currentTime2 = millis() / 1000;
+        //     flag2 = 1;
+    // }
+        // if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 1) {
+        //     for (Platelet i : platelets) {
+        //         if (i.activated) {
+        //             for (int j = 0;j < 3;j++)
+        //                 proteins.add(new Protein(new PVector(i.position.x,i.position.y),5, maxForce));
+        //         }
+        //     }
+        //     currentTime2 = millis() / 1000;
+        //     flag2 = 0;
+    // }
+        // p.checkCollision();
         p.checkBoundary();
         p.run();
         
@@ -133,7 +180,7 @@ void draw() {
     
     for (Protein prot : proteins) {
         //if (dist(prot.position.x,prot.position.y,damage.position.x,damage.position.y)>random(10,300))
-        prot.follow(flowfield);
+        //prot.follow(flowfield);
         prot.checkBoundary();
         prot.run();
     }
@@ -151,16 +198,16 @@ void draw() {
     
     // add platelets everey 5 seconds
     if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
-        for (int i = 0;i < amounts;i++){
-            platelets.add(new Platelet(new PVector(width, random(height-35,height - 32.5)), contentSpeed,  maxForce));
+        for (int i = 0;i < amounts;i++) {
+            platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5)), contentSpeed,  maxForce));
             platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
         }
         currentTime = millis() / 1000;
         flag = 1;
     }
     if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
-        for (int i = 0;i < amounts;i++){
-            platelets.add(new Platelet(new PVector(width, random(height-35,height - 32.5)), contentSpeed,  maxForce));
+        for (int i = 0;i < amounts;i++) {
+            platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5)), contentSpeed,  maxForce));
             platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
         }
         currentTime = millis() / 1000;

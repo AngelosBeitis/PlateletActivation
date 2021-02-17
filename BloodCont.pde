@@ -1,4 +1,4 @@
-abstract class BloodCont{
+abstract class BloodCont extends DwParticle2D{
     
     // The usual stuff
     PVector position;
@@ -9,8 +9,10 @@ abstract class BloodCont{
     float radius;
     float currentSpeed;
     boolean activated;
+    float[] fluid_velocity;
     
     BloodCont(PVector l, float s, float mf,float rad) {
+        super(1,l.x,l.y,rad);
         position = l.get();
         speed = s;
         radius = rad;
@@ -21,16 +23,16 @@ abstract class BloodCont{
     
     // Implementing Reynolds' flow field following algorithm
     // http://www.red3d.com/cwr/steer/FlowFollow.html
-    public void follow(FlowField flow) {
-        // What is the vector at that spot in the flow field?
-        PVector desired = flow.lookup(position);
-        // Scale it up by maxspeed
-        desired.mult(positionSpeed());
-        // Steering is desired minus velocity
-        PVector steer = PVector.sub(desired, velocity);
-        steer.limit(maxForce);  // Limit to maximum steering force
-        applyForce(steer);
-    }
+    // public void follow(FlowField flow) {
+    //     // What is the vector at that spot in the flow field?
+    //     PVector desired = flow.lookup(position);
+    //     // Scale it up by maxspeed
+    //     desired.mult(positionSpeed());
+    //     // Steering is desired minus velocity
+    //     PVector steer = PVector.sub(desired, velocity);
+    //     steer.limit(maxForce);  // Limit to maximum steering force
+    //     applyForce(steer);
+ // }
     public void run() {
         update();
         display();
@@ -38,15 +40,31 @@ abstract class BloodCont{
     
     // Method to update position
     public void update() {
-        // Update velocity
-        velocity.add(acceleration);
-        if(positionSpeed()==0)
-            velocity.limit(speed);
-        else
-            velocity.limit(maxSpeed);
-        position.add(velocity);
-        // Reset accelertion to 0 each cycle
-        acceleration.mult(0);
+        fluid_velocity = fluid.getVelocity(fluid_velocity);
+        
+        // add force: FLuid Velocity
+        float[] fluid_vxy = new float[2];
+        
+        int px_view = Math.round(this.cx);
+        int py_view = Math.round(height - 1 - this.cy); // invert y
+        
+        int px_grid = px_view / fluid.grid_scale;
+        int py_grid = py_view / fluid.grid_scale;
+        
+        int w_grid  = fluid.tex_velocity.src.w;
+        int h_grid  = fluid.tex_velocity.src.h;
+        
+        // clamp coordinates, just in case
+        if (px_grid < 0) px_grid = 0; else if (px_grid >= w_grid) px_grid = w_grid;
+        if (py_grid < 0) py_grid = 0; else if (py_grid >= h_grid) py_grid = h_grid;
+        
+        int PIDX = py_grid * w_grid + px_grid;
+        
+        fluid_vxy[0] = + fluid_velocity[PIDX * 2 + 0] * 0.05f * 0.50f;
+        fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * 0.50f; // invert y
+        
+        this.addForce(fluid_vxy);
+        
     }
     
     public void applyForce(PVector force) {
@@ -68,7 +86,7 @@ abstract class BloodCont{
         }
         // within damaged cell
         if (position.x > damage.left.x + this.radius && position.x < damage.right.x + this.radius) {
-            //if damage is on top
+            //ifdamage is on top
             if (position.y < 15 + this.radius)
                 position.y = 15 + this.radius;
             // if damage is on the bottom
@@ -112,29 +130,29 @@ abstract class BloodCont{
         return currentSpeed;
     }
     
-    public void moveTo(float x,float y,boolean flag) {
-        
-        PVector target = new PVector(x,y);
-        float distance = dist(position.x,position.y,x,y);
-        PVector desired = PVector.sub(target,position);
-        float d = desired.mag();
-        desired.normalize();
-        float speed = positionSpeed();
-        float m;
-        if (flag)
-            m = map(d,1,distance,0,0.2);
-        //m = 2;
-        else
-            m = map(d,0,100,flowfield.maxSpeed,currentSpeed);
-        //float m = 1;
-        desired.mult(m);
-        PVector flowVelocity = flowVelocity();
-        PVector steer = PVector.sub(desired,velocity);
-        steer.add(flowVelocity);
-        steer.limit(maxforce);
-        applyForce(steer);
-        
-    }
+    // public void moveTo(float x,float y,boolean flag) {
+      
+    //     PVector target = new PVector(x,y);
+    //     float distance = dist(position.x,position.y,x,y);
+    //     PVector desired = PVector.sub(target,position);
+    //     float d = desired.mag();
+    //     desired.normalize();
+    //     float speed = positionSpeed();
+    //     float m;
+    //     if (flag)
+    //         m = map(d,1,distance,0,0.2);
+    //     //m = 2;
+    //     else
+    //         m = map(d,0,100,flowfield.maxSpeed,currentSpeed);
+    //     //float m = 1;
+    //     desired.mult(m);
+    //     PVector flowVelocity = flowVelocity();
+    //     PVector steer = PVector.sub(desired,velocity);
+    //     steer.add(flowVelocity);
+    //     steer.limit(maxforce);
+    //     applyForce(steer);
+      
+  // }
     
     
 }
