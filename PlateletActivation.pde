@@ -33,7 +33,7 @@ void setup() {
     
     
     frameRate(60);
-    size(640, 340);
+    size(640, 340,FX2D);
     // Make a new flow field with "resolution" of 20
     flowfield = new FlowField(20,5,20,maxSpeed);
     rbcs = new ArrayList<Rbc>();
@@ -41,21 +41,22 @@ void setup() {
     proteins = new ArrayList<Protein>();
     
     flowfield.display();
-
+    
     for (int i = 0;i < 500;i++) {
         rbcs.add(new Rbc(new PVector(random(0,width), random(35,height - 35)), contentSpeed, maxForce));  
     }
     for (int i = 0;i < 5;i++) {
-        platelets.add(new Platelet(new PVector(random(0,width), random(height-35,height - 32.5)), contentSpeed,  maxForce));
+        platelets.add(new Platelet(new PVector(random(0,width), random(height - 35,height - 32.5)), contentSpeed,  maxForce));
         platelets.add(new Platelet(new PVector(random(0,width), random(32.5,50)), contentSpeed,  maxForce));
         
     }
-    for (int i=0; i<20;i++){
+    for (int i = 0; i < 20;i++) {
         float x = random(damage.left.x + 7, damage.right.x - 7);
         float y = random(damage.top.y,damage.bottom.y);
         proteins.add(new Protein(new PVector(x,y),contentSpeed,maxForce));
     }
 }
+
 
 void draw() {
     
@@ -65,6 +66,7 @@ void draw() {
     // Display the flowfield in "debug" mode
     flowfield.display();
     damage.display(); 
+    print(frameRate + "\n");
     //flowfield.pull();
     //heartBeat();
     
@@ -151,16 +153,16 @@ void draw() {
     
     // add platelets everey 5 seconds
     if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
-        for (int i = 0;i < amounts;i++){
-            platelets.add(new Platelet(new PVector(width, random(height-35,height - 32.5)), contentSpeed,  maxForce));
+        for (int i = 0;i < amounts;i++) {
+            platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5)), contentSpeed,  maxForce));
             platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
         }
         currentTime = millis() / 1000;
         flag = 1;
     }
     if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
-        for (int i = 0;i < amounts;i++){
-            platelets.add(new Platelet(new PVector(width, random(height-35,height - 32.5)), contentSpeed,  maxForce));
+        for (int i = 0;i < amounts;i++) {
+            platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5)), contentSpeed,  maxForce));
             platelets.add(new Platelet(new PVector(width, random(32.5,50)), contentSpeed,  maxForce));
         }
         currentTime = millis() / 1000;
