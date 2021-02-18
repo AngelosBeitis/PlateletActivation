@@ -44,7 +44,7 @@ void setup() {
     
     
     frameRate(60);
-    size(640, 340,FX2D);
+    size(640, 340,P2D);
     //fullScreen(P2D);
     DwPixelFlow context = new DwPixelFlow(this);
     //print(displayHeight + " " + displayWidth + " " + height + " " + width + "\n");
@@ -134,6 +134,7 @@ void draw() {
         //     r.stickTo(p);
     // }
         r.update(fluid_velocity);
+        r.updatePosition(1);
         r.display(pg);
     }
     
