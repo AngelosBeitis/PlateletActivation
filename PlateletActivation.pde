@@ -44,7 +44,7 @@ void setup() {
     
     
     frameRate(60);
-    size(640, 340,P2D);
+    size(640, 340,FX2D);
     //fullScreen(P2D);
     DwPixelFlow context = new DwPixelFlow(this);
     //print(displayHeight + " " + displayWidth + " " + height + " " + width + "\n");
@@ -67,7 +67,7 @@ void setup() {
             
             
         }
-    } );
+    });
     
     
     
@@ -133,9 +133,10 @@ void draw() {
         // for (Platelet p : platelets) {
         //     r.stickTo(p);
     // }
-        //r.update(fluid_velocity);
-        //r.display(pg);
+        r.update(fluid_velocity);
+        r.display(pg);
     }
+    
     
     
     for (int i = rbcs.size() - 1; i>= 0;i--) {
@@ -180,12 +181,12 @@ void draw() {
     // }
         // p.checkCollision();
         p.checkBoundary();
-        shapePlatelets.addChild(p.getShape());
         //p.update(fluid_velocity);
-        //p.display(pg);
+        p.display(pg);
         
     }
-    pg.shape(shapePlatelets);
+    
+    
     for (int i = platelets.size() - 1; i>= 0;i--) {
         BloodCont p = platelets.get(i);
         if (p.position.x < 0 - p.radius || p.position.y > height + p.radius || p.position.y < 0 - p.radius) {
@@ -199,7 +200,7 @@ void draw() {
         //prot.follow(flowfield);
         prot.checkBoundary();
         prot.update(fluid_velocity);
-        prot.display(pg);
+        //prot.display();
     }
     for (int i = proteins.size() - 1; i>= 0;i--) {
         BloodCont prot = proteins.get(i);

@@ -1,26 +1,32 @@
 class Rbc extends BloodCont{
     
     boolean stuck;
+    PShape shape;
     
     Rbc(PVector l, float ms, float mf) {
         super(l,ms,mf,5);
         stuck = false;
+        createShapes();
     }
+    
     @Override
     public void display(PGraphics pg) {
+        pg.shape(this.shape);
+        createShapes();
+        
+    }
+    public void createShapes() {
         float theta = velocity.heading2D() + radians(90);
         stroke(0);
         pushMatrix();
         PShape rbc = createShape(GROUP);
         
-        PShape body = createShape(ELLIPSE,position.x,position.y, this.radius * 2, this.radius * 2);
-        PShape inner = createShape(ELLIPSE,position.x,position.y, this.radius, this.radius);
+        PShape body = createShape(ELLIPSE,cx,cy, this.radius * 2, this.radius * 2);
+        PShape inner = createShape(ELLIPSE,cx,cy, this.radius, this.radius);
         fill(255,0,0);
         rbc.addChild(body);
         rbc.addChild(inner);
-        setShape(rbc);
-        pg.shape(rbc);        
-        //shape(rbc);
+        this.shape = rbc;
         popMatrix();
     }
     public void stickTo(Platelet p) {

@@ -2,13 +2,14 @@ class Platelet extends BloodCont{
     
     public boolean activated;
     public PVector positionInDamage;    
-    
+    PShape shape;
     
     
     Platelet(PVector l, float ms, float mf) {
         
         super(l,ms,mf,2.5);
         activated = false;
+        createShapes();
     }
     
     // public boolean scan(Damage d) {
@@ -74,12 +75,18 @@ class Platelet extends BloodCont{
     
     @Override
     public void display(PGraphics pg) {
+        pg.shape(this.shape);
+        
+    }
+    
+    public void createShapes() {
         if (!activated) {
             fill(255);
             stroke(0);
             //ellipse(position.x,position.y,this.radius * 2,this.radius * 2);
             PShape inactive = createShape(ELLIPSE,position.x,position.y,this.radius * 2,this.radius * 2);
-            setShape(inactive);
+            //setShape(inactive);
+            this.shape = inactive;
         }
         else{
             float theta = velocity.heading2D() + radians(90);
@@ -107,7 +114,8 @@ class Platelet extends BloodCont{
             
             
             // Draw the group
-            setShape(platelet);
+            //setShape(platelet);
+            this.shape = platelet;
             popMatrix();
         }
         

@@ -12,6 +12,7 @@ abstract class BloodCont extends DwParticle2D{
     
     BloodCont(PVector l, float s, float mf,float rad) {
         super(1,l.x,l.y,rad);
+        this.setPosition(l.x,l.y);
         position = l.get();
         speed = s;
         radius = rad;
@@ -58,7 +59,10 @@ abstract class BloodCont extends DwParticle2D{
         fluid_vxy[0] = + fluid_velocity[PIDX * 2 + 0] * 0.05f * 0.50f;
         fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * 0.50f; // invert y
         
+        // PVector force = new PVector(fluid_vxy[0],fluid_vxy[1]);
+        // this.applyForce(force);
         this.addForce(fluid_vxy);
+        //this.moveTo(fluid_vxy,0.1);
         
     }
     
