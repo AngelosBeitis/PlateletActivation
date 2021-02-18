@@ -32,7 +32,7 @@ void setup() {
     // controlP5.addSlider("slider2",0,20,128,70,100,100,10).setValue(maxSpeed);
     
     
-    frameRate(70);
+    frameRate(100);
     size(640, 340,FX2D);
     // Make a new flow field with "resolution" of 20
     flowfield = new FlowField(20,5,20,maxSpeed);
