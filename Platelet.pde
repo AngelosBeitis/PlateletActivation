@@ -2,15 +2,16 @@ class Platelet extends BloodCont{
     
     public boolean activated;
     public PVector positionInDamage;    
-    PShape shape;
     
     
     Platelet(PVector l, float ms, float mf) {
         
-        super(l,ms,mf,2.5);
+        super(l,ms,mf,1.5);
         activated = false;
         createShapes();
+        
     }
+    
     
     // public boolean scan(Damage d) {
     //    if (positionInDamage == null) {
@@ -32,20 +33,20 @@ class Platelet extends BloodCont{
     //    return withinDist;
     
 // }
-    @Override
-    public void update(float[] fluid_velocity) {
-        // Update velocity
-        if (!this.activated) {
-            velocity.add(acceleration);
-            if (positionSpeed() == 0)
-                velocity.limit(speed);
-            else
-                velocity.limit(maxSpeed);
-            position.add(velocity);
-            // Reset accelertion to 0 each cycle
-            acceleration.mult(0);
-        }
-    }
+    // @Override
+    // public void update(float[] fluid_velocity) {
+    //     // Update velocity
+    //     if (!this.activated) {
+    //         velocity.add(acceleration);
+    //         if (positionSpeed() == 0)
+    //             velocity.limit(speed);
+    //         else
+    //             velocity.limit(maxSpeed);
+    //         position.add(velocity);
+    //         // Reset accelertion to 0 each cycle
+    //         acceleration.mult(0);
+    //     }
+// }
     
     // public boolean scanForProteins() {
     
@@ -73,12 +74,6 @@ class Platelet extends BloodCont{
         this.radius = 4;     
     }
     
-    @Override
-    public void display(PGraphics pg) {
-        pg.shape(this.shape);
-        
-    }
-    
     public void createShapes() {
         if (!activated) {
             fill(255);
@@ -86,7 +81,7 @@ class Platelet extends BloodCont{
             //ellipse(position.x,position.y,this.radius * 2,this.radius * 2);
             PShape inactive = createShape(ELLIPSE,position.x,position.y,this.radius * 2,this.radius * 2);
             //setShape(inactive);
-            this.shape = inactive;
+            setShape(inactive);
         }
         else{
             float theta = velocity.heading2D() + radians(90);
@@ -115,7 +110,7 @@ class Platelet extends BloodCont{
             
             // Draw the group
             //setShape(platelet);
-            this.shape = platelet;
+            setShape(platelet);
             popMatrix();
         }
         
@@ -126,8 +121,8 @@ class Platelet extends BloodCont{
             if (this.activated || o.activated) {
                 // Get distances between the balls components
                 PVector distanceVect = PVector.sub(o.position, position);
-                float m = this.radius *.1;
-                float m2 = o.radius * .1;
+                float m = this.radius * .1;
+                float m2 = o.radius *.1;
                 
                 
                 // Calculate magnitude of the vector separating the balls

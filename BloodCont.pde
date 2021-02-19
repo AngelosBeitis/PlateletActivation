@@ -38,7 +38,7 @@ abstract class BloodCont extends DwParticle2D{
     // Method to update position
     public void update(float[] fluid_velocity) {
         
-        // add force: FLuid Velocity
+        // add force: Fluid Velocity
         float[] fluid_vxy = new float[2];
         
         int px_view = Math.round(this.cx);
@@ -59,10 +59,10 @@ abstract class BloodCont extends DwParticle2D{
         fluid_vxy[0] = + fluid_velocity[PIDX * 2 + 0] * 0.05f * 0.50f;
         fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * 0.50f; // invert y
         
-        // PVector force = new PVector(fluid_vxy[0],fluid_vxy[1]);
-        // this.applyForce(force);
+        
         this.addForce(fluid_vxy);
-        //this.moveTo(fluid_vxy,0.1);
+        updateShapePosition();
+        updatePosition(0.5);
         
     }
     
@@ -71,68 +71,48 @@ abstract class BloodCont extends DwParticle2D{
         acceleration.add(force);
     }
     
-    abstract void display(PGraphics pg);
-    
+    public void display(PGraphics pg) {
+        pg.shape(this.getShape());
+        
+    }    
     public void checkBoundary() {
         //bottom boundary
-        if (position.y > height - this.radius - 30) {
-            position.y = height - this.radius - 30;
+        if (cy > height - this.rad - 30) {
+            cy = height - this.rad - 30;
             
         }
         //top boundary
-        if (position.y < 30 + this.radius && (position.x < damage.left.x - this.radius || position.x > damage.right.x + this.radius)) {
-            position.y = 30 + radius;
+        if (cy < 30 + this.rad && (cx < damage.left.x - this.rad || cx > damage.right.x + this.rad)) {
+            cy = 30 + radius;
         }
         // within damaged cell
-        if (position.x > damage.left.x + this.radius && position.x < damage.right.x + this.radius) {
+        if (cx > damage.left.x + this.rad && cx < damage.right.x + this.rad) {
             //ifdamage is on top
-            if (position.y < 15 + this.radius)
-                position.y = 15 + this.radius;
+            if (cy < 15 + this.rad)
+                cy = 15 + this.rad;
             // if damage is on the bottom
-            if (position.y > height - 15 + this.radius)
-                position.y = height - 15 + this.radius;
+            if (cy > height - 15 + this.rad)
+                cy = height - 15 + this.rad;
         }
-        if (position.x < damage.left.x + this.radius && position.y > height - this.radius - 15) {
-            position.x = damage.left.x + this.radius;
+        if (cx < damage.left.x + this.rad && cy > height - this.rad - 15) {
+            cx = damage.left.x + this.rad;
         }
-        if (position.x > damage.right.x + this.radius && position.y > height - this.radius - 15) {
-            position.x = damage.right.x + this.radius;
+        if (cx > damage.right.x + this.rad && cy > height - this.rad - 15) {
+            cx = damage.right.x + this.rad;
         }
-        if (position.x < damage.left.x + this.radius && position.y < 15 + this.radius) {
-            position.x = damage.left.x + this.radius;
+        if (cx < damage.left.x + this.rad && cy < 15 + this.rad) {
+            cx = damage.left.x + this.rad;
         }
-        if (position.x > damage.right.x + this.radius && position.y < 15 + this.radius) {
-            position.x = damage.right.x + this.radius;
+        if (cx > damage.right.x + this.rad && cy < 15 + this.rad) {
+            cx = damage.right.x + this.rad;
         }
         
-    }
-    public PVector flowVelocity() {
-        PVector flowVelocity = flowfield.lookup(position);
-        if (position.y >= height / 2)
-            flowVelocity.mult(positionSpeed());
-        else
-            flowVelocity.mult(positionSpeed());
-        
-        return flowVelocity;     
-    }
-    
-    public float positionSpeed() {
-        
-        if (position.y >= height / 2)
-            currentSpeed = map(position.y,height / 2,height - 30 - this.radius ,flowfield.maxSpeed,0);
-        else
-            currentSpeed = map(position.y,30 + this.radius,height / 2,0,flowfield.maxSpeed);
-        
-        if (position.y <= 30 || position.y >= height - 30) {
-            currentSpeed = 0;
-        }
-        return currentSpeed;
     }
     
     // public void moveTo(float x,float y,boolean flag) {
     
     //     PVector target = new PVector(x,y);
-    //     float distance = dist(position.x,position.y,x,y);
+    //     float distance = dist(cx,cy,x,y);
     //     PVector desired = PVector.sub(target,position);
     //     float d = desired.mag();
     //     desired.normalize();

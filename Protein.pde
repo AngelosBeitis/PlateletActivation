@@ -4,15 +4,15 @@ class Protein extends BloodCont{
         
         super(l,ms,mf,1);      
         velocity.add(random(- 50,100),random(0,100));
+        createShapes();
     }
     
-    @Override
-    public void display(PGraphics pg) {
+    public void createShapes() {
         
         //float theta = velocity.heading2D() + radians(90);
         fill(0,255,0);
         stroke(0);
-        ellipse(position.x,position.y,radius,radius);
+        setShape(createShape(ELLIPSE,cx,cy,rad,rad));
     }
     // @Override
     // public void follow(FlowField flow) {
