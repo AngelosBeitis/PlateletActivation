@@ -4,99 +4,92 @@ class Platelet extends BloodCont{
     public PVector positionInDamage;    
     
     
-    Platelet(PVector l, float ms, float mf) {
+    Platelet(PVector l) {
         
-        super(l,ms,mf,1.5);
+        super(l,1.5);
         activated = false;
         createShapes();
         
     }
     
     
-    // public boolean scan(Damage d) {
-    //    if (positionInDamage == null) {
-    //        float newX = random(d.left.x + 7, d.right.x - 7);
-    //        float newY = d.top.y + 2.5;
-    //        positionInDamage = new PVector(newX,newY);
-    //     }
-    //    float distance = dist(position.x,position.y,positionInDamage.x,positionInDamage.y);
-    //    distance = distance - this.radius;
-    //    boolean withinDist = distance < 10;
-    //    float moveX = d.position.x;
-    //    float moveY = d.position.y;
-    //    if (withinDist) {
-    //        moveTo(positionInDamage.x, positionInDamage.y,true);
-    //        //activate at the damaged area
-    //        if (distance < 0.2)
-    //            activate();
-    //     }
-    //    return withinDist;
+    public boolean scan(Damage d) {
+        if (positionInDamage == null) {
+            float newX = random(d.left.x + 7, d.right.x - 7);
+            float newY = d.top.y + 2.5;
+            positionInDamage = new PVector(newX,newY);
+        }
+        float distance = dist(cx,cy,positionInDamage.x,positionInDamage.y);
+        distance = distance - this.rad;
+        boolean withinDist = distance < 10;
+        float moveX = d.position.x;
+        float moveY = d.position.y;
+        if (withinDist) {
+            float[] cnew = new float[2];
+            cnew[0] = positionInDamage.x;
+            cnew[1] = positionInDamage.y;
+            moveTo(cnew,1);
+            //activate at the damaged area
+            if (distance < 0.2)
+                activate();
+        }
+        return withinDist;
+        
+    }
     
-// }
-    // @Override
-    // public void update(float[] fluid_velocity) {
-    //     // Update velocity
-    //     if (!this.activated) {
-    //         velocity.add(acceleration);
-    //         if (positionSpeed() == 0)
-    //             velocity.limit(speed);
-    //         else
-    //             velocity.limit(maxSpeed);
-    //         position.add(velocity);
-    //         // Reset accelertion to 0 each cycle
-    //         acceleration.mult(0);
-    //     }
-// }
-    
-    // public boolean scanForProteins() {
-    
-    //     float distance;
-    //     for (Protein p : proteins) {
-    //         distance = dist(position.x,position.y,p.position.x,p.position.y);
-    //         if (!activated && distance < 10) {
-    //             moveTo(p.position.x,p.position.y,true);
-    //             if (distance < 2) {
-    //                 proteins.remove(p);
-    //                 scanForProteins();
-    //             }
-    //             return true;
-    //         }
-    //     }
-    
-    //     return false;
-    
-// }
+    public boolean scanForProteins() {
+        float distance;
+        for (Protein p : proteins) {
+            float[] cnew = new float[2];
+            cnew[0] = p.cx;
+            cnew[1] = p.cy;
+            
+            distance = dist(cx,cy,p.cx,p.cy);
+            if (!activated && distance < 10) {
+                moveTo(cnew,1);
+                if (distance < 2) {
+                    proteins.remove(p);
+                    scanForProteins();
+                }
+                return true;
+            }
+        }
+        
+        return false;
+        
+    }
     
     
     public void activate() {
         activated = true;
-        currentSpeed = 0;
-        this.radius = 4;     
+        this.rad = 4;     
     }
     
-    public void createShapes() {
+    private void createShapes() {
         if (!activated) {
-            fill(255);
             stroke(0);
-            //ellipse(position.x,position.y,this.radius * 2,this.radius * 2);
-            PShape inactive = createShape(ELLIPSE,position.x,position.y,this.radius * 2,this.radius * 2);
-            //setShape(inactive);
-            setShape(inactive);
+            pushMatrix();
+            fill(255);
+            PShape platelet = createShape(GROUP);
+            
+            PShape body = createShape(ELLIPSE,0,0, this.rad * 2, this.rad * 2);
+            fill(255);
+            platelet.addChild(body);
+            setShape(platelet);     
+            popMatrix();
         }
         else{
-            float theta = velocity.heading2D() + radians(90);
             fill(255);
             stroke(0);
             pushMatrix();
-            translate(position.x,position.y);
-            rotate(theta);
+            translate(cx,cy);
             PShape platelet = createShape(GROUP);
             
             // Make 4shapes
-            PShape body = createShape(ELLIPSE, 0, 0,this.radius * 2,this.radius * 2);
-            PShape leg1 = createShape(LINE, 0, - this.radius * 2,this.radius / 8,this.radius * 2);
-            PShape leg2 = createShape(LINE, 0, - this.radius * 2 ,this.radius / 8,this.radius * 2);
-            PShape leg3 = createShape(LINE, 0, - this.radius * 2 ,this.radius / 8,this.radius * 2);
+            PShape body = createShape(ELLIPSE, 0, 0,this.rad * 2,this.rad * 2);
+            PShape leg1 = createShape(LINE, 0, - this.rad * 2,this.rad / 8,this.rad * 2);
+            PShape leg2 = createShape(LINE, 0, - this.rad * 2 ,this.rad / 8,this.rad * 2);
+            PShape leg3 = createShape(LINE, 0, - this.rad * 2 ,this.rad / 8,this.rad * 2);
             body.fill(255);
             leg2.rotate(1);
             leg3.rotate(2);
@@ -109,50 +102,14 @@ class Platelet extends BloodCont{
             
             
             // Draw the group
-            //setShape(platelet);
             setShape(platelet);
             popMatrix();
         }
         
     }
-    
-    public void checkCollision() {
-        for (Platelet o : platelets) {
-            if (this.activated || o.activated) {
-                // Get distances between the balls components
-                PVector distanceVect = PVector.sub(o.position, position);
-                float m = this.radius * .1;
-                float m2 = o.radius *.1;
-                
-                
-                // Calculate magnitude of the vector separating the balls
-                float distanceVectMag = distanceVect.mag();
-                
-                // Minimum distance before they are touching
-                float minDistance = this.radius + o.radius;
-                
-                if (distanceVectMag < minDistance) {
-                    float distanceCorrection = (minDistance - distanceVectMag) / 2.0;
-                    PVector d = distanceVect.copy();
-                    PVector correctionVector = d.normalize().mult(distanceCorrection);
-                    
-                    if (!o.activated) {
-                        o.position.add(correctionVector);
-                        if (this.activated && o.withinDamage())
-                            o.activate();
-                    }
-                    if (!this.activated) {
-                        position.sub(correctionVector);
-                        if (o.activated && this.withinDamage()) 
-                            this.activate();
-                    }
-                }
-            }
-        }
-    }
-    
+     
     public boolean withinDamage() {
-        if (position.y < damage.bottom.y && position.x > damage.left.x && position.x < damage.right.x)
+        if (cy < damage.bottom.y && cx > damage.left.x && cx < damage.right.x)
             return true;
         return false;
     }

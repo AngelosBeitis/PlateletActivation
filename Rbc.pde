@@ -2,16 +2,17 @@ class Rbc extends BloodCont{
     
     boolean stuck;
     
-    Rbc(PVector l, float ms, float mf) {
-        super(l,ms,mf,2);
+    Rbc(PVector l) {
+        super(l,2);
         stuck = false;
         createShapes();
     }
     
-    public void createShapes() {
-        float theta = velocity.heading2D() + radians(90);
+    private void createShapes() {
         stroke(0);
         pushMatrix();
+        fill(255,0,0);
+        
         PShape rbc = createShape(GROUP);
         
         PShape body = createShape(ELLIPSE,0,0, this.rad * 2, this.rad * 2);
@@ -25,35 +26,10 @@ class Rbc extends BloodCont{
     
     public void stickTo(Platelet p) {
         
-        if (p.activated == true && dist(position.x,position.y,p.position.x,p.position.y) < 2) {
-            velocity = new PVector(0,0);
-            acceleration = new PVector(0,0);
+        if (p.activated == true && dist(cx,cy,p.cx,p.cy) < 2) {
+            
             stuck = true;
         }
     }
     
-    // public void checkCollision(ArrayList<Rbc> others) {
-    //     for (Rbc other : others) {
-    
-    //         // Get distances between the balls components
-    //         PVector distanceVect = PVector.sub(other.position, position);
-    
-    //         float m =this.radius * .1;
-    
-    //         // Calculate magnitude of the vector separating the balls
-    //         float distanceVectMag = distanceVect.mag();
-    
-    //         // Minimum distance before they are touching
-    //         float minDistance =this.radius + other.radius;
-    
-    //         if (distanceVectMag < minDistance) {
-    //             float distanceCorrection = (minDistance - distanceVectMag) / 2.0;
-    //             PVector d = distanceVect.copy();
-    //             PVector correctionVector = d.normalize().mult(distanceCorrection);
-    //             other.position.add(correctionVector);
-    //             position.sub(correctionVector);
-    
-    //         }
-    //     }
-//}
 }

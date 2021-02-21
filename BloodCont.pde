@@ -1,39 +1,13 @@
 abstract class BloodCont extends DwParticle2D{
     
     // The usual stuff
-    PVector position;
-    PVector velocity;
-    PVector acceleration;
-    float maxforce;    // Maximum steering force
-    float speed;    // Maximum speed
-    float radius;
-    float currentSpeed;
-    boolean activated;
     
-    BloodCont(PVector l, float s, float mf,float rad) {
+    
+    BloodCont(PVector l,float rad) {
         super(1,l.x,l.y,rad);
         this.setPosition(l.x,l.y);
-        position = l.get();
-        speed = s;
-        radius = rad;
-        maxforce = mf;
-        acceleration = new PVector(0,0);
-        velocity = new PVector(0,0);
+        
     }
-    
-    // Implementing Reynolds' flow field following algorithm
-    // http://www.red3d.com/cwr/steer/FlowFollow.html
-    // public void follow(FlowField flow) {
-    //     // What is the vector at that spot in the flow field?
-    //     PVector desired = flow.lookup(position);
-    //     // Scale it up by maxspeed
-    //     desired.mult(positionSpeed());
-    //     // Steering is desired minus velocity
-    //     PVector steer = PVector.sub(desired, velocity);
-    //     steer.limit(maxForce);  // Limit to maximum steering force
-    //     applyForce(steer);
-// }
-    
     
     // Method to update position
     public void update(float[] fluid_velocity) {
@@ -55,7 +29,6 @@ abstract class BloodCont extends DwParticle2D{
         if (py_grid < 0) py_grid = 0; else if (py_grid >= h_grid) py_grid = h_grid;
         
         int PIDX = py_grid * w_grid + px_grid;
-        
         fluid_vxy[0] = + fluid_velocity[PIDX * 2 + 0] * 0.05f * 0.50f;
         fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * 0.50f; // invert y
         
@@ -64,11 +37,6 @@ abstract class BloodCont extends DwParticle2D{
         updateShapePosition();
         updatePosition(0.5);
         
-    }
-    
-    public void applyForce(PVector force) {
-        // We could add mass here if we want A = F / M
-        acceleration.add(force);
     }
     
     public void display(PGraphics pg) {
@@ -83,7 +51,7 @@ abstract class BloodCont extends DwParticle2D{
         }
         //top boundary
         if (cy < 30 + this.rad && (cx < damage.left.x - this.rad || cx > damage.right.x + this.rad)) {
-            cy = 30 + radius;
+            cy = 30 + this.rad;
         }
         // within damaged cell
         if (cx > damage.left.x + this.rad && cx < damage.right.x + this.rad) {
