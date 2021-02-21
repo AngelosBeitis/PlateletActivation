@@ -48,7 +48,6 @@ void setup() {
     
     frameRate(60);
     size(840, 340,P2D);
-    //fullScreen(P2D);
     DwPixelFlow context = new DwPixelFlow(this);
     //print(displayHeight + " " + displayWidth + " " + height + " " + width + "\n");
     fluid = new Fluid(context, width, height, 1);
@@ -156,18 +155,18 @@ void draw() {
         
     }
     
-    
+    int g = 0;
     for (Platelet p : platelets) {
+        p.setCollisionGroup(g);
+        g++;
+    }
+    for (Platelet p : platelets) {
+        
         if (p.scan(damage)) {
             
         }
         else if (p.scanForProteins()) {
             p.scan(damage);;
-        }
-        else{
-            if (!p.activated)
-                //p.follow(flowfield);
-               ;
         }
         
         if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
@@ -190,8 +189,9 @@ void draw() {
             currentTime2 = millis() / 1000;
             flag2 = 0;
         }
-        // p.checkCollision();
         p.checkBoundary();
+        
+        //p.collision(platelets);
         p.update(fluid_velocity);
         simulationShapes.addChild(p.getShape());
         
@@ -200,11 +200,10 @@ void draw() {
     
     
     for (Protein prot : proteins) {
-        //if (dist(prot.position.x,prot.position.y,damage.position.x,damage.position.y)>random(10,300))
-        //prot.follow(flowfield);
-        //prot.checkBoundary();
+        prot.checkBoundary();
         prot.update(fluid_velocity);
         simulationShapes.addChild(prot.getShape());
+        //prot.moveTo();
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////

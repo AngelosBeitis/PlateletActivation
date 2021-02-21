@@ -77,14 +77,14 @@ abstract class BloodCont extends DwParticle2D{
         
     }
     
+    // @Override
     // public void moveTo(float x,float y,boolean flag) {
-    
+    //     PVector position = new PVector(cx,cy);
     //     PVector target = new PVector(x,y);
     //     float distance = dist(cx,cy,x,y);
     //     PVector desired = PVector.sub(target,position);
     //     float d = desired.mag();
     //     desired.normalize();
-    //     float speed = positionSpeed();
     //     float m;
     //     if (flag)
     //         m = map(d,1,distance,0,0.2);
@@ -98,8 +98,8 @@ abstract class BloodCont extends DwParticle2D{
     //     steer.add(flowVelocity);
     //     steer.limit(maxforce);
     //     applyForce(steer);
-    
-// }
+      
+  // }
     
     
 }

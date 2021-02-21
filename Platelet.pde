@@ -8,6 +8,7 @@ class Platelet extends BloodCont{
         
         super(l,1.5);
         activated = false;
+        enableCollisions(true);
         createShapes();
         
     }
@@ -21,16 +22,16 @@ class Platelet extends BloodCont{
         }
         float distance = dist(cx,cy,positionInDamage.x,positionInDamage.y);
         distance = distance - this.rad;
-        boolean withinDist = distance < 10;
+        boolean withinDist = distance < 100;
         float moveX = d.position.x;
         float moveY = d.position.y;
         if (withinDist) {
             float[] cnew = new float[2];
             cnew[0] = positionInDamage.x;
             cnew[1] = positionInDamage.y;
-            moveTo(cnew,1);
+            moveTo(cnew,0.01);
             //activate at the damaged area
-            if (distance < 0.2)
+            if (distance < 0.2 && activated == false)
                 activate();
         }
         return withinDist;
@@ -46,7 +47,7 @@ class Platelet extends BloodCont{
             
             distance = dist(cx,cy,p.cx,p.cy);
             if (!activated && distance < 10) {
-                moveTo(cnew,1);
+                moveTo(cnew,0.01);
                 if (distance < 2) {
                     proteins.remove(p);
                     scanForProteins();
@@ -62,7 +63,9 @@ class Platelet extends BloodCont{
     
     public void activate() {
         activated = true;
-        this.rad = 4;     
+        this.rad = 2;
+        //create the new shape
+        createShapes();     
     }
     
     private void createShapes() {
@@ -82,7 +85,7 @@ class Platelet extends BloodCont{
             fill(255);
             stroke(0);
             pushMatrix();
-            translate(cx,cy);
+            //translate(cx,cy);
             PShape platelet = createShape(GROUP);
             
             // Make 4shapes
@@ -107,10 +110,19 @@ class Platelet extends BloodCont{
         }
         
     }
-     
+    
     public boolean withinDamage() {
         if (cy < damage.bottom.y && cx > damage.left.x && cx < damage.right.x)
             return true;
         return false;
+    }
+    
+    public void collision(List<Platelet> platelets) {
+        for (Platelet p : platelets) {
+            this.updateCollision(p);
+            afterCollision();
+        }
+        
+        
     }
 }
