@@ -61,16 +61,16 @@ void setup() {
     fluid.addCallback_FluiData(new  DwFluid2D.FluidData() {
         public void update(DwFluid2D fluid) {
             float px, py, vx, vy, radius, vscale, r, g, b, intensity, temperature;
-            px = width / 2 + 15;
+            px = width + 15;
             py = height / 2;
-            vx = 0;
-            vy = 100;
-            //radius = height / 2 - 30;
-            radius = 10;
+            vx = - 100;
+            vy = 0;
+            radius = height / 2 - 30;
+            //radius = 60;
             intensity = 1;
             fluid.addDensity(px, py, radius, 1, 1, 1, intensity);
-            //radius = height / 2 - 30;
-            radius = 10;
+            radius = height / 2 - 30;
+            //radius = 30;
             fluid.addVelocity(px, py, radius, vx, vy);
             
             
@@ -128,7 +128,7 @@ void draw() {
     fluid_velocity = fluid.getVelocity(fluid_velocity);
     
     pg_fluid.beginDraw();
-    background(0); 
+    //background(0); 
     pg_fluid.endDraw();
     fluid.renderFluidTextures(pg_fluid, 0);
     PGraphics pgSimulation = this.g;
