@@ -98,8 +98,8 @@ abstract class BloodCont extends DwParticle2D{
     //     steer.add(flowVelocity);
     //     steer.limit(maxforce);
     //     applyForce(steer);
-      
-  // }
+    
+// }
     
     
 }

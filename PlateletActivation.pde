@@ -64,17 +64,17 @@ void setup() {
             py = height / 2;
             vx = - 100;
             vy = 0;
-            radius = height / 2 - 30;
+            radius = height / 2;
             //radius = 60;
-            intensity = 1;
+            intensity = 3;
             fluid.addDensity(px, py, radius, 1, 1, 1, intensity);
-            radius = height / 2 - 30;
+            radius = height / 2;
             //radius = 30;
             fluid.addVelocity(px, py, radius, vx, vy);
             
             
         }
-    });
+    } );
     
     
     
@@ -110,10 +110,7 @@ void setup() {
     
     pg_fluid = (PGraphics2D) createGraphics(width, height, P2D);
     pg_obstacle = (PGraphics2D) createGraphics(width, height, P2D);
-    pg_obstacle.beginDraw();
-    pg_obstacle.shape(back.sim);
-    pg_obstacle.endDraw();
-    fluid.addObstacles(pg_obstacle);
+    
     
     
     
@@ -122,7 +119,26 @@ void setup() {
 
 void draw() {
     
-    background(255,252,182);   
+    background(255,252,182); 
+    PGraphics pgSimulation = this.g;
+    PShape simulationShapes = new PShape();
+    simulationShapes.addChild(back.sim);
+    
+    pg_obstacle.noSmooth();
+    pg_obstacle.beginDraw();
+    pg_obstacle.clear();
+    
+    // border-obstacle
+    pg_obstacle.strokeWeight(20);
+    pg_obstacle.stroke(64);
+    pg_obstacle.fill(255);
+    
+    pg_obstacle.shape(simulationShapes);
+    
+    pg_obstacle.endDraw();
+    
+    fluid.addObstacles(pg_obstacle);
+    
     fluid.update();
     fluid_velocity = fluid.getVelocity(fluid_velocity);
     
@@ -130,14 +146,12 @@ void draw() {
     //background(0); 
     pg_fluid.endDraw();
     fluid.renderFluidTextures(pg_fluid, 0);
-    PGraphics pgSimulation = this.g;
-    PShape simulationShapes = new PShape();
+    
     //print(frameRate + "\n");
     
     image(pg_fluid, 0, 0);
     
     // Display the flowfield in "debug" mode
-    simulationShapes.addChild(back.sim);
     
     damage.display(); 
     // Tell all the vehicles to follow the flow field

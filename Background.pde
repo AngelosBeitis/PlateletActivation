@@ -41,7 +41,7 @@ class Background {
                 fill(255,255,0);
                 sim.addChild(createShape(RECT,start,15,end,15,7));
                 fill(0,0,0);
-                sim.addChild(createShape(RECT,(start + (end / 2)),(45 / 2) ,10,5));
+                sim.addChild(createShape(ELLIPSE,(start + (end / 2)),(45 / 2) ,10,5));
                 fill(255,255,0);
                 sim.addChild(createShape(RECT,start, height - 30, end , 15, 7));
                 fill(0,0,0);

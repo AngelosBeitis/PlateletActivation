@@ -22,7 +22,7 @@ class Platelet extends BloodCont{
         }
         float distance = dist(cx,cy,positionInDamage.x,positionInDamage.y);
         distance = distance - this.rad;
-        boolean withinDist = distance < 100;
+        boolean withinDist = distance < 3;
         float moveX = d.position.x;
         float moveY = d.position.y;
         if (withinDist) {
