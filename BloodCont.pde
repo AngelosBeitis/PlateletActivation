@@ -29,7 +29,7 @@ abstract class BloodCont extends DwParticle2D{
         if (py_grid < 0) py_grid = 0; else if (py_grid >= h_grid) py_grid = h_grid;
         
         int PIDX = py_grid * w_grid + px_grid;
-        fluid_vxy[0] = + fluid_velocity[PIDX * 2 + 0] * 0.05f * 0.50f;
+        fluid_vxy[0] = + fluid_velocity[PIDX * 2] * 0.05f * 0.50f;
         fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * 0.50f; // invert y
         
         

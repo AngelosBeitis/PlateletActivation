@@ -54,23 +54,25 @@ void setup() {
     
     // some fluid parameters
     fluid.param.dissipation_velocity = 1f;
-    fluid.param.dissipation_density  = 1f;
+    fluid.param.dissipation_density  = 1;
+    //fluid.param.timestep = 1;
     
     //adding data to the fluid simulation
     fluid.addCallback_FluiData(new  DwFluid2D.FluidData() {
         public void update(DwFluid2D fluid) {
             float px, py, vx, vy, radius, vscale, r, g, b, intensity, temperature;
-            px = width + 15;
+            px = width;
             py = height / 2;
             vx = - 100;
             vy = 0;
             radius = height / 2;
             //radius = 60;
-            intensity = 3;
-            fluid.addDensity(px, py, radius, 1, 1, 1, intensity);
-            radius = height / 2;
-            //radius = 30;
+            intensity = 1;
+            fluid.addDensity(px, py, radius, 255, 0, 0, intensity);
+            // //radius = height / 2 - 30;
+            // //radius = 30;
             fluid.addVelocity(px, py, radius, vx, vy);
+            
             
             
         }
@@ -78,9 +80,8 @@ void setup() {
     
     
     
-    
     // Make a new flow field with "resolution" of 20
-    back = new Background(5,20);
+    back = new Background(10,20);
     rbcs = new ArrayList<Rbc>();
     platelets = new ArrayList<Platelet>();
     proteins = new ArrayList<Protein>();
@@ -204,8 +205,8 @@ void draw() {
             flag2 = 0;
         }
         p.checkBoundary();
-        
-        //p.collision(platelets);
+        // if (p.activated)
+        //     p.collision(platelets);
         p.update(fluid_velocity);
         simulationShapes.addChild(p.getShape());
         
