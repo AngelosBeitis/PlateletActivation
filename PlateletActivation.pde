@@ -76,7 +76,7 @@ void setup() {
             
             
         }
-    } );
+    });
     
     
     
@@ -146,11 +146,11 @@ void draw() {
     pg_fluid.beginDraw();
     //background(0); 
     pg_fluid.endDraw();
-    fluid.renderFluidTextures(pg_fluid, 0);
+    //fluid.renderFluidTextures(pg_fluid, 0);
     
     //print(frameRate + "\n");
     
-    image(pg_fluid, 0, 0);
+    //image(pg_fluid, 0, 0);
     
     // Display the flowfield in "debug" mode
     
