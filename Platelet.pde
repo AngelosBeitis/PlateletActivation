@@ -48,12 +48,13 @@ class Platelet extends BloodCont{
             distance = dist(cx,cy,p.cx,p.cy);
             if (!activated && distance < 10) {
                 moveTo(cnew,0.01);
-                if (distance < 2) {
-                    proteins.remove(p);
-                    scanForProteins();
-                }
-                return true;
             }
+            if (distance < 2) {
+                proteins.remove(p);
+                scanForProteins();
+            }
+            return true;
+            
         }
         
         return false;

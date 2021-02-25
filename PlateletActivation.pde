@@ -68,7 +68,7 @@ void setup() {
             radius = height / 2;
             //radius = 60;
             intensity = 1;
-            fluid.addDensity(px, py, radius, 255, 0, 0, intensity);
+            fluid.addDensity(px, py, radius, 1, 1, 1, intensity);
             // //radius = height / 2 - 30;
             // //radius = 30;
             fluid.addVelocity(px, py, radius, vx, vy);
@@ -146,11 +146,11 @@ void draw() {
     pg_fluid.beginDraw();
     //background(0); 
     pg_fluid.endDraw();
-    //fluid.renderFluidTextures(pg_fluid, 0);
+    fluid.renderFluidTextures(pg_fluid, 0);
     
     //print(frameRate + "\n");
     
-    //image(pg_fluid, 0, 0);
+    image(pg_fluid, 0, 0);
     
     // Display the flowfield in "debug" mode
     
