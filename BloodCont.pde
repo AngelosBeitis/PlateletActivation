@@ -1,10 +1,12 @@
 abstract class BloodCont extends DwParticle2D{
     
     // The usual stuff
-    
+    public DwParticle2D.Param param = new DwParticle2D.Param();
     
     BloodCont(PVector l,float rad) {
         super(1,l.x,l.y,rad);
+        param.DAMP_COLLISION = 0.2f;
+        param.DAMP_VELOCITY  = 0.2f;
         this.setPosition(l.x,l.y);
         
     }
@@ -34,8 +36,8 @@ abstract class BloodCont extends DwParticle2D{
         
         
         this.addForce(fluid_vxy);
-        updateShapePosition();
-        updatePosition(1);
+        // updateShapePosition();
+        // updatePosition(1);
         
     }
     
@@ -91,8 +93,8 @@ abstract class BloodCont extends DwParticle2D{
     //     o[0] = desired.x;
     //     o[1] = desired.y;
     //     this.addForce(o);
-       
-   // }
+    
+// }
     
     
 }

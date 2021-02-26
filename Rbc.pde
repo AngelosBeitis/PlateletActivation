@@ -6,6 +6,8 @@ class Rbc extends BloodCont{
         super(l,2);
         stuck = false;
         createShapes();
+        enableCollisions(false);
+        
     }
     
     private void createShapes() {
