@@ -39,10 +39,8 @@ PGraphics2D pg_obstacle;
 void setup() {
     //size(330,260);
     
-    //controlP5 = new ControlP5(this);
+    controlP5 = new ControlP5(this);
     
-    // controlP5.addSlider("slider1",0,50,128,70,80,100,10).setValue(amounts);
-    // controlP5.addSlider("slider2",0,20,128,70,100,100,10).setValue(maxSpeed);
     
     
     
@@ -53,30 +51,35 @@ void setup() {
     fluid = new Fluid(context, width, height, 1);
     
     // some fluid parameters
-    fluid.param.dissipation_velocity = 1f;
-    fluid.param.dissipation_density  = 1;
-    //fluid.param.timestep = 1;
+    fluid.param.dissipation_velocity = 1;
+    fluid.param.dissipation_density  = 1f;
+    controlP5.addSlider("slider1",0,1,128,70,80,100,10).setValue(fluid.param.dissipation_density);
+    controlP5.addSlider("slider2",0,1,128,70,100,100,10).setValue(fluid.param.dissipation_velocity);
+    
+    fluid.param.dissipation_temperature = 0f;
+    fluid.param.timestep = 1;
+    fluid.param.num_jacobi_projection = 90;
+    fluid.param.vorticity = 0;
+    fluid.param.gridscale = 0.1;
+    //fluid.simulation_step = 10;
     
     //adding data to the fluid simulation
     fluid.addCallback_FluiData(new  DwFluid2D.FluidData() {
         public void update(DwFluid2D fluid) {
             float px, py, vx, vy, radius, vscale, r, g, b, intensity, temperature;
-            px = width;
+            px = width + 10;
             py = height / 2;
-            vx = - 100;
+            vx = - PI;
             vy = 0;
-            radius = height / 2;
-            //radius = 60;
-            intensity = 1;
+            radius = height / 2 - 35;
+            intensity = 3;
             fluid.addDensity(px, py, radius, 1, 1, 1, intensity);
-            // //radius = height / 2 - 30;
-            // //radius = 30;
             fluid.addVelocity(px, py, radius, vx, vy);
             
             
             
         }
-    });
+    } );
     
     
     

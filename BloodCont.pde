@@ -29,13 +29,13 @@ abstract class BloodCont extends DwParticle2D{
         if (py_grid < 0) py_grid = 0; else if (py_grid >= h_grid) py_grid = h_grid;
         
         int PIDX = py_grid * w_grid + px_grid;
-        fluid_vxy[0] = + fluid_velocity[PIDX * 2] * 0.05f * 0.50f;
-        fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * 0.50f; // invert y
+        fluid_vxy[0] = + fluid_velocity[PIDX * 2] * 0.05f * 1f;
+        fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * 1f; // invert y
         
         
         this.addForce(fluid_vxy);
         updateShapePosition();
-        updatePosition(0.5);
+        updatePosition(1);
         
     }
     
@@ -77,27 +77,20 @@ abstract class BloodCont extends DwParticle2D{
         
     }
     
-    // @Override
-    // public void moveTo(float x,float y,boolean flag) {
+    // public void moveTo(float x,float y) {
     //     PVector position = new PVector(cx,cy);
     //     PVector target = new PVector(x,y);
     //     float distance = dist(cx,cy,x,y);
     //     PVector desired = PVector.sub(target,position);
     //     float d = desired.mag();
     //     desired.normalize();
-    //     float m;
-    //     if (flag)
-    //         m = map(d,1,distance,0,0.2);
-    //     //m = 2;
-    //     else
-    //         m = map(d,0,100,flowfield.maxSpeed,currentSpeed);
-    //     //float m = 1;
+    //     float m = ax;
     //     desired.mult(m);
-    //     PVector flowVelocity = flowVelocity();
-    //     PVector steer = PVector.sub(desired,velocity);
-    //     steer.add(flowVelocity);
-    //     steer.limit(maxforce);
-    //     applyForce(steer);
+    //     //PVector steer = PVector.sub(desired,velocity);
+    //     float[] o = new float[2];
+    //     o[0] = desired.x;
+    //     o[1] = desired.y;
+    //     this.addForce(o);
        
    // }
     

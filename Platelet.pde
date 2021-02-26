@@ -29,7 +29,8 @@ class Platelet extends BloodCont{
             float[] cnew = new float[2];
             cnew[0] = positionInDamage.x;
             cnew[1] = positionInDamage.y;
-            moveTo(cnew,0.01);
+            moveTo(cnew,distance / 1000);
+            //moveTo(positionInDamage.x,positionInDamage.y);
             //activate at the damaged area
             if (distance < 0.2 && activated == false)
                 activate();
@@ -46,10 +47,11 @@ class Platelet extends BloodCont{
             cnew[1] = p.cy;
             
             distance = dist(cx,cy,p.cx,p.cy);
-            if (!activated && distance < 10) {
-                moveTo(cnew,0.01);
+            if (!activated && distance < 20) {
+                moveTo(cnew,distance / 1000);
+                //moveTo(p.cx,p.cy);
             }
-            if (distance < 2) {
+            if (distance < 2 && !activated) {
                 proteins.remove(p);
                 scanForProteins();
             }

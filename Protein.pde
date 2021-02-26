@@ -3,10 +3,10 @@ class Protein extends BloodCont{
     Protein(PVector l) {
         
         super(l,1);   
-        ax = 0;
-        ay = 0;   
+        ax = 0.1;
+        ay = 0.1;   
         // will make them stay close to the damaged area
-        //mass = 0.01;
+        //mass = 2;
         createShapes();
     }
     
