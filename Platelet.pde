@@ -68,7 +68,7 @@ class Platelet extends BloodCont{
         activated = true;
         this.rad = 2;
         //create the new shape
-        //createShapes();     
+        createShapes();     
     }
     
     private void createShapes() {
@@ -81,7 +81,9 @@ class Platelet extends BloodCont{
             PShape body = createShape(ELLIPSE,0,0, this.rad * 2, this.rad * 2);
             fill(255);
             platelet.addChild(body);
-            setShape(platelet);     
+            platelet.setFill(255);
+            setShape(platelet);
+            setColor(255);     
             popMatrix();
         }
         else{
@@ -105,10 +107,11 @@ class Platelet extends BloodCont{
             platelet.addChild(leg2);
             platelet.addChild(leg3);
             platelet.addChild(body);
-            
+            platelet.fill(255);
             
             // Draw the group
             setShape(platelet);
+            setColor(255);
             popMatrix();
         }
         
@@ -148,7 +151,7 @@ class Platelet extends BloodCont{
     //             float distanceCorrection = (minDistance - distanceVectMag) / 2.0;
     //             PVector d = distanceVect.copy();
     //             PVector correctionVector = d.normalize().mult(distanceCorrection);
-      
+    
     //             //otherPosition.add(correctionVector);
     //             o.cx += correctionVector.x;
     //             o.cy += correctionVector.y;
