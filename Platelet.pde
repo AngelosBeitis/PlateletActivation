@@ -6,7 +6,7 @@ class Platelet extends BloodCont{
     
     Platelet(PVector l) {
         
-        super(l,1.5);
+        super(l,2);
         activated = false;
         enableCollisions(true);
         createShapes();
@@ -66,7 +66,7 @@ class Platelet extends BloodCont{
     
     public void activate() {
         activated = true;
-        this.rad = 2;
+        this.setRadius(2);
         //create the new shape
         createShapes();     
     }
@@ -79,17 +79,15 @@ class Platelet extends BloodCont{
             PShape platelet = createShape(GROUP);
             
             PShape body = createShape(ELLIPSE,0,0, this.rad * 2, this.rad * 2);
-            fill(255);
             platelet.addChild(body);
-            platelet.setFill(255);
             setShape(platelet);
-            setColor(255);     
             popMatrix();
         }
         else{
-            fill(255);
             stroke(0);
+            
             pushMatrix();
+            fill(255);
             //translate(cx,cy);
             PShape platelet = createShape(GROUP);
             
@@ -98,7 +96,6 @@ class Platelet extends BloodCont{
             PShape leg1 = createShape(LINE, 0, - this.rad * 2,this.rad / 8,this.rad * 2);
             PShape leg2 = createShape(LINE, 0, - this.rad * 2 ,this.rad / 8,this.rad * 2);
             PShape leg3 = createShape(LINE, 0, - this.rad * 2 ,this.rad / 8,this.rad * 2);
-            body.fill(255);
             leg2.rotate(1);
             leg3.rotate(2);
             // Add the 4 "child" shapes to the parent group
@@ -107,11 +104,9 @@ class Platelet extends BloodCont{
             platelet.addChild(leg2);
             platelet.addChild(leg3);
             platelet.addChild(body);
-            platelet.fill(255);
             
             // Draw the group
             setShape(platelet);
-            setColor(255);
             popMatrix();
         }
         
@@ -131,39 +126,27 @@ class Platelet extends BloodCont{
         
         
     }
-    // public void checkCollision() {
-    //     for (Platelet o : platelets) {
-    //         // Get distances between the balls components
-    //         PVector otherPosition = new PVector(o.cx,o.cy);
-    //         PVector position = new PVector(cx,cy);
-    //         PVector distanceVect = PVector.sub(otherPosition, position);
-    
-    
-    
-    //         // Calculate magnitude of the vector separating the balls
-    //         float distanceVectMag = distanceVect.mag();
-    
-    //         // Minimum distance before they are touching
-    
-    //         float minDistance = this.rad + o.rad;
-    
-    //         if (distanceVectMag < minDistance) {
-    //             float distanceCorrection = (minDistance - distanceVectMag) / 2.0;
-    //             PVector d = distanceVect.copy();
-    //             PVector correctionVector = d.normalize().mult(distanceCorrection);
-    
-    //             //otherPosition.add(correctionVector);
-    //             o.cx += correctionVector.x;
-    //             o.cy += correctionVector.y;
-    //             // if (this.activated)
-    //             //     o.activate();
-    //             //position.sub(correctionVector);
-    //             cx += correctionVector.x;
-    //             cy += correctionVector.y;
-    //             // if (o.activated) 
-    //             //     this.activate();
-    //         }
-    //     }
-// }
+    public void checkCollision() {
+        for (Platelet o : platelets) {
+            // Get distances between the balls components
+            PVector otherPosition = new PVector(o.cx,o.cy);
+            PVector position = new PVector(cx,cy);
+            PVector distanceVect = PVector.sub(otherPosition, position);
+            
+            
+            
+            // Calculate magnitude of the vector separating the balls
+            float distanceVectMag = distanceVect.mag();
+            
+            // Minimum distance before they are touching
+            
+            float minDistance = this.rad + o.rad;
+            
+            if (distanceVectMag < minDistance) {
+                if (!o.activated && this.activated) o.activate();
+                else if (!this.activated && o.activated) this.activate();
+            }
+        }
+    }
     
 }

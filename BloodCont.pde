@@ -1,12 +1,10 @@
 abstract class BloodCont extends DwParticle2D{
     
     // The usual stuff
-    public DwParticle2D.Param param = new DwParticle2D.Param();
     
     BloodCont(PVector l,float rad) {
         super(1,l.x,l.y,rad);
-        param.DAMP_COLLISION = 0.2f;
-        param.DAMP_VELOCITY  = 0.2f;
+        
         this.setPosition(l.x,l.y);
         
     }
@@ -36,15 +34,12 @@ abstract class BloodCont extends DwParticle2D{
         
         
         this.addForce(fluid_vxy);
-        // updateShapePosition();
-        // updatePosition(1);
+        updateShapePosition();
+        updatePosition(1);
         
     }
+    //abstract void createShapes();
     
-    public void display(PGraphics pg) {
-        pg.shape(this.getShape());
-        
-    }    
     public void checkBoundary() {
         //bottom boundary
         if (cy > height - this.rad - 30) {
@@ -64,37 +59,22 @@ abstract class BloodCont extends DwParticle2D{
             if (cy > height - 15 + this.rad)
                 cy = height - 15 + this.rad;
         }
-        if (cx < damage.left.x + this.rad && cy > height - this.rad - 15) {
+        if (cx < damage.left.x + this.rad && cy > height - this.rad - 30) {
             cx = damage.left.x + this.rad;
+            
         }
-        if (cx > damage.right.x + this.rad && cy > height - this.rad - 15) {
-            cx = damage.right.x + this.rad;
+        if (cx > damage.right.x - this.rad && cy > height - this.rad - 30) {
+            cx = damage.right.x - this.rad;
+            
         }
-        if (cx < damage.left.x + this.rad && cy < 15 + this.rad) {
-            cx = damage.left.x + this.rad;
+        if (cx < damage.left.x + this.rad && cy < 30 + this.rad) {
+            cx = damage.left.x + this.rad;            
         }
-        if (cx > damage.right.x + this.rad && cy < 15 + this.rad) {
-            cx = damage.right.x + this.rad;
+        if (cx > damage.right.x - this.rad && cy < 30 + this.rad) {
+            cx = damage.right.x - this.rad;
+            
         }
         
     }
-    
-    // public void moveTo(float x,float y) {
-    //     PVector position = new PVector(cx,cy);
-    //     PVector target = new PVector(x,y);
-    //     float distance = dist(cx,cy,x,y);
-    //     PVector desired = PVector.sub(target,position);
-    //     float d = desired.mag();
-    //     desired.normalize();
-    //     float m = ax;
-    //     desired.mult(m);
-    //     //PVector steer = PVector.sub(desired,velocity);
-    //     float[] o = new float[2];
-    //     o[0] = desired.x;
-    //     o[1] = desired.y;
-    //     this.addForce(o);
-    
-// }
-    
     
 }

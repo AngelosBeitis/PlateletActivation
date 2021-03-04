@@ -11,21 +11,22 @@ class Rbc extends BloodCont{
     }
     
     private void createShapes() {
+        
         stroke(0);
         pushMatrix();
-        fill(color(255,0,0));
+        fill(255,0,0);
         
         PShape rbc = createShape(GROUP);
         
         PShape body = createShape(ELLIPSE,0,0, this.rad * 2, this.rad * 2);
-        //PShape inner = createShape(ELLIPSE,0,0, this.radius, this.radius);
+        //PShape inner = createShape(ELLIPSE,0,0, this.rad / 2, this.rad / 2);
         rbc.addChild(body);
-        rbc.setStroke(color(255,0,0));
-        rbc.setFill(color(255,0,0));
         //rbc.addChild(inner);
-        setShape(rbc);  
-        //this.setColor(120);   
+        this.setShape(rbc);
+        //this.setColor(color(255,0,0));
+        
         popMatrix();
+        
     }
     
     public void stickTo(Platelet p) {

@@ -7,7 +7,6 @@ class Damage{
     PVector bottom;
     PVector left;
     PVector right;
-    
     Damage(float l, float r,float t, float b) {
         
         float x1 = (l + r) / 2;
@@ -21,12 +20,10 @@ class Damage{
         height = dist(top.x,top.y,bottom.x,bottom.y);
     }
     
-    public void display() {
+    public void createShapes() {
         
-        //fill(73,70,70);
-        noFill();
-        noStroke();
-        rect(left.x, top.y, right.x , bottom.y, 7);
+        
+        
         
         
     }
