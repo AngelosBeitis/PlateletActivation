@@ -51,7 +51,7 @@ abstract class BloodCont extends DwParticle2D{
             cy = 30 + this.rad;
         }
         // within damaged cell
-        if (cx > damage.left.x + this.rad && cx < damage.right.x + this.rad) {
+        if (cx > damage.left.x - this.rad && cx < damage.right.x + this.rad) {
             //ifdamage is on top
             if (cy < 15 + this.rad)
                 cy = 15 + this.rad;

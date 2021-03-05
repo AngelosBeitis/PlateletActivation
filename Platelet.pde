@@ -6,7 +6,7 @@ class Platelet extends BloodCont{
     
     Platelet(PVector l) {
         
-        super(l,2);
+        super(l,1.5);
         activated = false;
         enableCollisions(true);
         createShapes();
@@ -22,15 +22,14 @@ class Platelet extends BloodCont{
         }
         float distance = dist(cx,cy,positionInDamage.x,positionInDamage.y);
         distance = distance - this.rad;
-        boolean withinDist = distance < 60;
+        boolean withinDist = distance < 15;
         float moveX = d.position.x;
         float moveY = d.position.y;
         if (withinDist) {
             float[] cnew = new float[2];
             cnew[0] = positionInDamage.x;
             cnew[1] = positionInDamage.y;
-            moveTo(cnew,0.01);
-            //moveTo(positionInDamage.x,positionInDamage.y);
+            moveTo(cnew,0.005);
             //activate at the damaged area
             if (distance < 0.2 && activated == false)
                 activate();
@@ -48,7 +47,7 @@ class Platelet extends BloodCont{
             
             distance = dist(cx,cy,p.cx,p.cy);
             if (!activated && distance < 20) {
-                moveTo(cnew,0.01);
+                moveTo(cnew,0.005);
                 //moveTo(p.cx,p.cy);
                 if (distance < 2) {
                     proteins.remove(p);
@@ -133,8 +132,6 @@ class Platelet extends BloodCont{
             PVector position = new PVector(cx,cy);
             PVector distanceVect = PVector.sub(otherPosition, position);
             
-            
-            
             // Calculate magnitude of the vector separating the balls
             float distanceVectMag = distanceVect.mag();
             
@@ -143,8 +140,10 @@ class Platelet extends BloodCont{
             float minDistance = this.rad + o.rad;
             
             if (distanceVectMag < minDistance) {
-                if (!o.activated && this.activated) o.activate();
-                else if (!this.activated && o.activated) this.activate();
+                
+                if (!this.activated && o.activated) {
+                    this.activate();
+                } 
             }
         }
     }

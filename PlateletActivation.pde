@@ -31,6 +31,8 @@ float maxForce = 0.6;
 int amounts = 10;
 PApplet papplet;
 float[] bounds;
+PShape obstacles;
+PShape simulationShapes;
 
 //PShape shapePlatelets;
 PGraphics2D pg_obstacle;
@@ -60,8 +62,8 @@ void setup() {
     // some fluid parameters
     fluid.param.dissipation_velocity = 1;
     fluid.param.dissipation_density  = 1f;
-    controlP5.addSlider("slider1",0,1,128,70,80,100,10).setValue(fluid.param.dissipation_density);
-    controlP5.addSlider("slider2",0,1,128,70,100,100,10).setValue(fluid.param.dissipation_velocity);
+    controlP5.addSlider("Fluid Density",0,1,128,70,80,100,10).setValue(fluid.param.dissipation_density);
+    controlP5.addSlider("Fluid Velocity",0,1,128,70,100,100,10).setValue(fluid.param.dissipation_velocity);
     
     fluid.param.dissipation_temperature = 0f;
     fluid.param.timestep = 1;
@@ -86,7 +88,7 @@ void setup() {
             
             
         }
-    } );
+    });
     
     
     
@@ -131,63 +133,57 @@ void setup() {
 void draw() {
     
     background(255,252,182); 
-    PShape simulationShapes = new PShape();
-    PShape obstacles = new PShape();
+    simulationShapes = new PShape();
+    obstacles = new PShape();
     obstacles.addChild(back.sim);
     simulationShapes.addChild(back.sim);
-    //pg_obstacle = (PGraphics2D) createGraphics(width, height, P2D);
     
-    //shape(damage.shape);
-    //DwParticle2D[] array = new DwParticle2D[platelets.size() + rbcs.size() + proteins.size()];
-    Platelet[] plateletArray = new Platelet[platelets.size()];
-    // Rbc[] rbcArray = new Rbc[rbcs.size()];
-    // Protein[] proteinsArray = new Protein[proteins.size()];
-    platelets.toArray(plateletArray);
-    // proteins.toArray(proteinsArray);
-    // rbcs.toArray(rbcArray);
-    // for (int i = 0;i < array.length;i++) {
-    //     if (i < platelets.size()) {
-    //         array[i] = plateletArray[i];
-    //     }
-    //     else if (i - platelets.size()< proteins.size()) {
-    //         array[i] = proteinsArray[i - platelets.size()];
-    //     }
-    //     else{
-    //         array[i] = rbcArray[i - platelets.size() - proteins.size()];
-    //     }
-// }
-    physics.param.GRAVITY[1] = 0;
-    physics.update_particle_shapes = false;
-    physics.param.iterations_collisions = 4;
-    physics.setParticles(plateletArray, plateletArray.length);
-    physics.update(1);
+    Physics();
+    RbcMechanics();
     
     
-    for (Rbc r : rbcs) {        
-        r.checkBoundary();
-        
-        for (Platelet p : platelets) {
-            r.stickTo(p);
-        }
-        //r.checkBoundary();
-        r.update(fluid_velocity);
-        simulationShapes.addChild(r.getShape());
-        
-    }
-    
-    int g = 0;
-    for (Platelet p : platelets) {
-        p.setCollisionGroup(g);
-        g++;
-    }
-    // for (Protein p : proteins) {
-    //     p.setCollisionGroup(g);
-    //     g++;
-// }
     // for (Rbc r : rbcs) {
-    //     r.setCollisionGroup(g);
-    //     g++;
+    //    r.setCollisionGroup(g);
+    //    g++;
 // }
+    PlateletMechanics();
+    ProteinMechanics();
+    
+    pg_obstacle.noSmooth();
+    pg_obstacle.beginDraw();
+    pg_obstacle.clear();
+    pg_obstacle.shape(obstacles);
+    pg_obstacle.endDraw();
+    fluid.addObstacles(pg_obstacle);
+    
+    fluid.update();
+    fluid_velocity = fluid.getVelocity(fluid_velocity);
+    
+    pg_fluid.beginDraw();
+    pg_fluid.endDraw();
+    
+    fluid.renderFluidTextures(pg_fluid, 0);
+    DeleteContent();
+    CreateContent();
+    
+    image(pg_fluid, 0, 0);
+    
+    //display shapes of the screen
+    shape(simulationShapes);  
+    
+    
+}
+
+void PlateletMechanics() {
+    int g = 1;
+    for (Platelet p : platelets) {
+        if (!p.activated)
+            p.setCollisionGroup(0);
+        else{
+            p.setCollisionGroup(g);
+            g++;
+        }
+    }
     for (Platelet p : platelets) {
         if (p.activated) {
             obstacles.addChild(p.getShape());
@@ -225,27 +221,81 @@ void draw() {
         
     }
     
+}
+void RbcMechanics() {
+    for (Rbc r : rbcs) {        
+        r.checkBoundary();
+        
+        for (Platelet p : platelets) {
+            r.stickTo(p);
+        }
+        //r.checkBoundary();
+        r.update(fluid_velocity);
+        simulationShapes.addChild(r.getShape());
+        
+    }
     
-    
+}
+void ProteinMechanics() {
     for (Protein prot : proteins) {
         prot.checkBoundary();
         prot.update(fluid_velocity);
         simulationShapes.addChild(prot.getShape());
     }
-    pg_obstacle.noSmooth();
-    pg_obstacle.beginDraw();
-    pg_obstacle.clear();
-    pg_obstacle.shape(obstacles);
-    pg_obstacle.endDraw();
-    fluid.addObstacles(pg_obstacle);
     
-    fluid.update();
-    fluid_velocity = fluid.getVelocity(fluid_velocity);
+}
+void Physics() {
+    Platelet[] plateletArray = new Platelet[platelets.size()];
+    // Rbc[] rbcArray = new Rbc[rbcs.size()];
+    // Protein[] proteinsArray = new Protein[proteins.size()];
+    platelets.toArray(plateletArray);
+    // proteins.toArray(proteinsArray);
+    // rbcs.toArray(rbcArray);
+    // for (int i = 0;i < array.length;i++) {
+    //     if (i < platelets.size()) {
+    //         array[i] = plateletArray[i];
+    //     }
+    //     else if (i - platelets.size()< proteins.size()) {
+    //         array[i] = proteinsArray[i - platelets.size()];
+    //     }
+    //     else{
+    //         array[i] = rbcArray[i - platelets.size() - proteins.size()];
+    //     }
+// }
+    physics.param.GRAVITY[1] = 0;
+    physics.update_particle_shapes = false;
+    physics.param.iterations_collisions = 4;
+    physics.setParticles(plateletArray, plateletArray.length);
+    physics.update(1);
+}
+void CreateContent() {
     
-    pg_fluid.beginDraw();
-    pg_fluid.endDraw();
+    // add red blood cells at a random height but at the right of the screen
+    rbcs.add(new Rbc(new PVector(width + 5, random(35,height - 35))));
+    rbcs.add(new Rbc(new PVector(width + 5, random(35,height - 35))));
     
-    fluid.renderFluidTextures(pg_fluid, 0);
+    
+    // add platelets everey 5 seconds
+    if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
+        for (int i = 0;i < amounts;i++) {
+            platelets.add(new Platelet(new PVector(width + 5, random(height - 35,height - 32.5))));
+            platelets.add(new Platelet(new PVector(width + 5, random(32.5,50))));
+        }
+        currentTime = millis() / 1000;
+        flag = 1;
+    }
+    if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
+        for (int i = 0;i < amounts;i++) {
+            platelets.add(new Platelet(new PVector(width + 5, random(height - 35,height - 32.5))));
+            platelets.add(new Platelet(new PVector(width + 5, random(32.5,50))));
+            
+        }
+        currentTime = millis() / 1000;
+        flag = 0;
+    }
+    
+}
+void DeleteContent() {
     //////////////////////////////////////////////////////////////////////////////////////////////////
     //delete content out of the grid
     for (int i = platelets.size() - 1; i>= 0;i--) {
@@ -269,45 +319,6 @@ void draw() {
         
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    
-    
-    
-    // add red blood cells at a random height but at the right of the screen
-    rbcs.add(new Rbc(new PVector(width + 5, random(35,height - 35))));
-    rbcs.add(new Rbc(new PVector(width + 5, random(35,height - 35))));
-    
-    
-    // add platelets everey 5 seconds
-    if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
-        for (int i = 0;i < amounts;i++) {
-            //platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5))));
-            //platelets.add(new Platelet(new PVector(width, random(32.5,50))));
-            platelets.add(new Platelet(new PVector(width + 5, random(35,height - 32.5))));
-        }
-        currentTime = millis() / 1000;
-        flag = 1;
-    }
-    if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
-        for (int i = 0;i < amounts;i++) {
-            //platelets.add(new Platelet(new PVector(width, random(height - 35,height - 32.5))));
-            //platelets.add(new Platelet(new PVector(width, random(32.5,50))));
-            platelets.add(new Platelet(new PVector(width + 5, random(35,height - 32.5))));
-            
-        }
-        currentTime = millis() / 1000;
-        flag = 0;
-    }
-    /////////////////////////////////////////////////////
-    //Physics for movement and collision
-    //physics = new DwPhysics<DwParticle2D>(param_physics);
-    
-    //////////////////////////////////////////////////////
-    image(pg_fluid, 0, 0);
-    //display shapes of the screen
-    shape(simulationShapes);  
-    
-    
 }
 //take screenshots by pressing s
 void keyPressed() {
