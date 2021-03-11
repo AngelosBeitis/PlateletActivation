@@ -2,11 +2,14 @@ class Platelet extends BloodCont{
     
     public boolean activated;
     public PVector positionInDamage;    
+    public int time;
+    public int flag;
     
     
     Platelet(PVector l) {
         
         super(l,1.5);
+        flag = 0;
         activated = false;
         enableCollisions(true);
         createShapes();
@@ -67,7 +70,8 @@ class Platelet extends BloodCont{
         activated = true;
         this.setRadius(2);
         //create the new shape
-        createShapes();     
+        createShapes();
+        //plug.addShape(this.getShape());     
     }
     
     private void createShapes() {
@@ -140,10 +144,20 @@ class Platelet extends BloodCont{
             float minDistance = this.rad + o.rad;
             
             if (distanceVectMag < minDistance) {
+                if (flag == 0) {
+                    this.time = millis() / 1000;
+                    this.flag = 1;
+                }
+                if (!this.activated && o.activated && this.time - (millis() / 1000) > 2) {
+                    this.activate();    
+                    this.time = millis() / 1000;   
+                    this.flag = 0;               
+                }
                 
-                if (!this.activated && o.activated) {
-                    this.activate();
-                } 
+            }
+            else{
+                this.flag = 0;
+                this.time = millis();
             }
         }
     }

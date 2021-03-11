@@ -33,6 +33,11 @@ PApplet papplet;
 float[] bounds;
 PShape obstacles;
 PShape simulationShapes;
+public Plug plug; 
+int stuck = 0;
+int activated = 0;
+int group = 1;
+
 
 //PShape shapePlatelets;
 PGraphics2D pg_obstacle;
@@ -50,7 +55,7 @@ void setup() {
     
     param_physics.GRAVITY = new float[]{0, 0};
     param_physics.bounds  = new float[]{ - 10, - 50, width + 50, height + 50}; // implement so the bounving effect of the library doesnt happen
-    param_physics.iterations_collisions = 4;
+    param_physics.iterations_collisions = 10;
     param_physics.iterations_springs    = 0; // no springs in this demo
     
     physics = new DwPhysics<DwParticle2D>(param_physics);
@@ -98,7 +103,7 @@ void setup() {
     platelets = new ArrayList<Platelet>();
     proteins = new ArrayList<Protein>();
     
-    
+    plug = new Plug();
     
     bounds = new float[4];
     bounds[0] = 0;
@@ -148,6 +153,7 @@ void draw() {
 // }
     PlateletMechanics();
     ProteinMechanics();
+    //if (activated > 0) simulationShapes.addChild(plug.shape);
     
     pg_obstacle.noSmooth();
     pg_obstacle.beginDraw();
@@ -175,13 +181,17 @@ void draw() {
 }
 
 void PlateletMechanics() {
-    int g = 1;
+    activated = 0;
+    for (Platelet p : platelets) {
+        if (p.activated) 
+            activated++;
+    }
     for (Platelet p : platelets) {
         if (!p.activated)
             p.setCollisionGroup(0);
         else{
-            p.setCollisionGroup(g);
-            g++;
+            p.setCollisionGroup(group);
+            group++;
         }
     }
     for (Platelet p : platelets) {
@@ -192,44 +202,50 @@ void PlateletMechanics() {
             p.scanForProteins();
         
         
-        // if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
-        //     for (Platelet i : platelets) {
-        //         if (i.activated) {
-        //             for (int j = 0;j < 1;j++) {
-        //                 proteins.add(new Protein(new PVector(i.cx,i.cy)));
-        //             }
-        //         }
-        //     }
-        //     currentTime2 = millis() / 1000;
-        //     flag2 = 1;
-    // }
-        // if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 1) {
-        //     for (Platelet i : platelets) {
-        //         if (i.activated) {
-        //             for (int j = 0;j < 1;j++)
-        //                 proteins.add(new Protein(new PVector(i.cx,i.cy)));
-        //         }
-        //     }
-        //     currentTime2 = millis() / 1000;
-        //     flag2 = 0;
-    // }
+        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
+            for (Platelet i : platelets) {
+                if (i.activated) {
+                    for (int j = 0;j < 1;j++) {
+                        proteins.add(new Protein(new PVector(i.cx,i.cy)));
+                    }
+                }
+            }
+            currentTime2 = millis() / 1000;
+            flag2 = 1;
+        }
+        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 1) {
+            for (Platelet i : platelets) {
+                if (i.activated) {
+                    for (int j = 0;j < 1;j++)
+                        proteins.add(new Protein(new PVector(i.cx,i.cy)));
+                }
+            }
+            currentTime2 = millis() / 1000;
+            flag2 = 0;
+        }
         p.checkBoundary();
         p.checkCollision();
         //if(p.activated) p.collision(platelets);
         p.update(fluid_velocity);
+        //if (!p.activated) 
         simulationShapes.addChild(p.getShape());
         
     }
     
 }
 void RbcMechanics() {
+    stuck = 0;
+    for (Rbc r : rbcs) {
+        if (r.stuck)
+            stuck++;
+    }
     for (Rbc r : rbcs) {        
         r.checkBoundary();
         
         for (Platelet p : platelets) {
             r.stickTo(p);
         }
-        //r.checkBoundary();
+        r.checkBoundary();
         r.update(fluid_velocity);
         simulationShapes.addChild(r.getShape());
         
@@ -264,7 +280,7 @@ void Physics() {
 // }
     physics.param.GRAVITY[1] = 0;
     physics.update_particle_shapes = false;
-    physics.param.iterations_collisions = 4;
+    physics.param.iterations_collisions = 10;
     physics.setParticles(plateletArray, plateletArray.length);
     physics.update(1);
 }
@@ -328,16 +344,7 @@ void keyPressed() {
 
 
 void mouseClicked() {
-    int stuck = 0;
-    int activated = 0;
-    for (Platelet p : platelets) {
-        if (p.activated) 
-            activated++;
-    }
-    for (Rbc r : rbcs) {
-        if (r.stuck)
-            stuck++;
-    }
+    
     print("Stuck: " + stuck + "\n");
     print("Activated: " + activated + "\n");
     print("Proteins:" + proteins.size() + "\n");
