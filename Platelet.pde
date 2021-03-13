@@ -7,7 +7,6 @@ class Platelet extends BloodCont{
     
     
     Platelet(PVector l) {
-        
         super(l,1.5);
         flag = 0;
         activated = false;
@@ -32,7 +31,7 @@ class Platelet extends BloodCont{
             float[] cnew = new float[2];
             cnew[0] = positionInDamage.x;
             cnew[1] = positionInDamage.y;
-            moveTo(cnew,0.005);
+            moveTo(cnew);
             //activate at the damaged area
             if (distance < 0.2 && activated == false)
                 activate();
@@ -50,7 +49,7 @@ class Platelet extends BloodCont{
             
             distance = dist(cx,cy,p.cx,p.cy);
             if (!activated && distance < 20) {
-                moveTo(cnew,0.005);
+                moveTo(cnew);
                 //moveTo(p.cx,p.cy);
                 if (distance < 2) {
                     proteins.remove(p);
@@ -129,7 +128,9 @@ class Platelet extends BloodCont{
         
         
     }
-    public void checkCollision() {
+    
+    public boolean checkCollision() {
+        boolean statement = false;
         for (Platelet o : platelets) {
             // Get distances between the balls components
             PVector otherPosition = new PVector(o.cx,o.cy);
@@ -142,8 +143,8 @@ class Platelet extends BloodCont{
             // Minimum distance before they are touching
             
             float minDistance = this.rad + o.rad;
-            
-            if (distanceVectMag < minDistance) {
+            if (distanceVectMag <= minDistance) {
+                
                 if (flag == 0) {
                     this.time = millis() / 1000;
                     this.flag = 1;
@@ -151,15 +152,38 @@ class Platelet extends BloodCont{
                 if (!this.activated && o.activated && this.time - (millis() / 1000) > 2) {
                     this.activate();    
                     this.time = millis() / 1000;   
-                    this.flag = 0;               
+                    this.flag = 0;    
+                    statement = true;           
                 }
-                
+                if (o.activated || this.activated) {
+                    float[] newo = new float[2];
+                    newo[0] = o.cx;
+                    newo[1] = o.cy;
+                    float[] newThis = new float[2];
+                    newThis[0] = this.cx;
+                    newThis[1] = this.cy;
+                    statement = true;
+                    
+                    this.moveTo(newo,0.005);
+                    o.moveTo(newThis,0.005);
+                }
             }
             else{
                 this.flag = 0;
                 this.time = millis();
             }
+            if (this.activated) {
+                statement = true;
+                float distFromDamage = dist(cx,cy,positionInDamage.x,positionInDamage.y);
+                if (distFromDamage <= this.rad) {
+                    float[] n = new float[2];
+                    n[0] = positionInDamage.x;
+                    n[1] = positionInDamage.y;
+                    this.moveTo(n,0.005);
+                }
+            }
         }
+        return statement;
     }
     
 }

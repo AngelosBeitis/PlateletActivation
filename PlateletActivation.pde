@@ -28,14 +28,13 @@ int currentTime3 = millis() / 1000;
 float maxSpeed = 10;
 float contentSpeed = 1;
 float maxForce = 0.6;
-int amounts = 10;
+int amounts = 3;
 PApplet papplet;
 float[] bounds;
 PShape obstacles;
 PShape simulationShapes;
 public Plug plug; 
 int stuck = 0;
-int activated = 0;
 int group = 1;
 
 
@@ -55,7 +54,7 @@ void setup() {
     
     param_physics.GRAVITY = new float[]{0, 0};
     param_physics.bounds  = new float[]{ - 10, - 50, width + 50, height + 50}; // implement so the bounving effect of the library doesnt happen
-    param_physics.iterations_collisions = 10;
+    param_physics.iterations_collisions = 3;
     param_physics.iterations_springs    = 0; // no springs in this demo
     
     physics = new DwPhysics<DwParticle2D>(param_physics);
@@ -69,6 +68,7 @@ void setup() {
     fluid.param.dissipation_density  = 1f;
     controlP5.addSlider("Fluid Density",0,1,128,70,80,100,10).setValue(fluid.param.dissipation_density);
     controlP5.addSlider("Fluid Velocity",0,1,128,70,100,100,10).setValue(fluid.param.dissipation_velocity);
+    controlP5.addSlider("Platelet amounts",0,1,128,70,120,100,10).setValue(amounts);
     
     fluid.param.dissipation_temperature = 0f;
     fluid.param.timestep = 1;
@@ -93,7 +93,7 @@ void setup() {
             
             
         }
-    });
+    } );
     
     
     
@@ -143,7 +143,6 @@ void draw() {
     obstacles.addChild(back.sim);
     simulationShapes.addChild(back.sim);
     
-    Physics();
     RbcMechanics();
     
     
@@ -152,6 +151,9 @@ void draw() {
     //    g++;
 // }
     PlateletMechanics();
+    //print("activated" + activated + "\n");
+    Physics();
+    
     ProteinMechanics();
     //if (activated > 0) simulationShapes.addChild(plug.shape);
     
@@ -181,11 +183,6 @@ void draw() {
 }
 
 void PlateletMechanics() {
-    activated = 0;
-    for (Platelet p : platelets) {
-        if (p.activated) 
-            activated++;
-    }
     for (Platelet p : platelets) {
         if (!p.activated)
             p.setCollisionGroup(0);
@@ -202,27 +199,27 @@ void PlateletMechanics() {
             p.scanForProteins();
         
         
-        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
-            for (Platelet i : platelets) {
-                if (i.activated) {
-                    for (int j = 0;j < 1;j++) {
-                        proteins.add(new Protein(new PVector(i.cx,i.cy)));
-                    }
-                }
-            }
-            currentTime2 = millis() / 1000;
-            flag2 = 1;
-        }
-        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 1) {
-            for (Platelet i : platelets) {
-                if (i.activated) {
-                    for (int j = 0;j < 1;j++)
-                        proteins.add(new Protein(new PVector(i.cx,i.cy)));
-                }
-            }
-            currentTime2 = millis() / 1000;
-            flag2 = 0;
-        }
+        // if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
+        //     for (Platelet i : platelets) {
+        //         if (i.activated) {
+        //             for (int j = 0;j < 1;j++) {
+        //                 proteins.add(new Protein(new PVector(i.cx,i.cy)));
+        //             }
+        //         }
+        //     }
+        //     currentTime2 = millis() / 1000;
+        //     flag2 = 1;
+    // }
+        // if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 1) {
+        //     for (Platelet i : platelets) {
+        //         if (i.activated) {
+        //             for (int j = 0;j < 1;j++)
+        //                 proteins.add(new Protein(new PVector(i.cx,i.cy)));
+        //         }
+        //     }
+        //     currentTime2 = millis() / 1000;
+        //     flag2 = 0;
+    // }
         p.checkBoundary();
         p.checkCollision();
         //if(p.activated) p.collision(platelets);
@@ -262,26 +259,21 @@ void ProteinMechanics() {
 }
 void Physics() {
     Platelet[] plateletArray = new Platelet[platelets.size()];
-    // Rbc[] rbcArray = new Rbc[rbcs.size()];
-    // Protein[] proteinsArray = new Protein[proteins.size()];
+    List<Platelet> activatedList = new ArrayList<Platelet>();
+    
     platelets.toArray(plateletArray);
-    // proteins.toArray(proteinsArray);
-    // rbcs.toArray(rbcArray);
-    // for (int i = 0;i < array.length;i++) {
-    //     if (i < platelets.size()) {
-    //         array[i] = plateletArray[i];
-    //     }
-    //     else if (i - platelets.size()< proteins.size()) {
-    //         array[i] = proteinsArray[i - platelets.size()];
-    //     }
-    //     else{
-    //         array[i] = rbcArray[i - platelets.size() - proteins.size()];
-    //     }
-// }
+    for (int i = 0;i < plateletArray.length;i++) {
+        if (plateletArray[i].activated || plateletArray[i].checkCollision()) {
+            activatedList.add(plateletArray[i]);            
+        }
+    }
+    Platelet[] activatedArray = new Platelet[activatedList.size()];
+    activatedList.toArray(activatedArray);
     physics.param.GRAVITY[1] = 0;
     physics.update_particle_shapes = false;
-    physics.param.iterations_collisions = 10;
-    physics.setParticles(plateletArray, plateletArray.length);
+    physics.param.iterations_springs    = 0;
+    physics.param.iterations_collisions = 3;
+    physics.setParticles(activatedArray, activatedArray.length);
     physics.update(1);
 }
 void CreateContent() {
@@ -294,16 +286,16 @@ void CreateContent() {
     // add platelets everey 5 seconds
     if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
         for (int i = 0;i < amounts;i++) {
-            platelets.add(new Platelet(new PVector(width + 5, random(height - 35,height - 32.5))));
-            platelets.add(new Platelet(new PVector(width + 5, random(32.5,50))));
+            platelets.add(new Platelet(new PVector(width + 5, random(33,height - 33))));
+            //platelets.add(new Platelet(new PVector(width + 5, random(33,height - 33))));
         }
         currentTime = millis() / 1000;
         flag = 1;
     }
     if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
         for (int i = 0;i < amounts;i++) {
-            platelets.add(new Platelet(new PVector(width + 5, random(height - 35,height - 32.5))));
-            platelets.add(new Platelet(new PVector(width + 5, random(32.5,50))));
+            platelets.add(new Platelet(new PVector(width + 5, random(33,height - 33))));
+            //platelets.add(new Platelet(new PVector(width + 5, random(33,height - 33))));
             
         }
         currentTime = millis() / 1000;
@@ -341,12 +333,19 @@ void keyPressed() {
     if (key == 's')
         saveFrame("ScreenShots/" + year() + nf(month(), 2) + nf(day(), 2) + "-" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png");	
 }
-
+int getActivated() {
+    int activated = 0;
+    for (Platelet p : platelets) {
+        if (p.activated) 
+            activated++;
+    }
+    return activated;
+}
 
 void mouseClicked() {
     
     print("Stuck: " + stuck + "\n");
-    print("Activated: " + activated + "\n");
+    print("Activated: " + getActivated() + "\n");
     print("Proteins:" + proteins.size() + "\n");
     print("Platelets:" + platelets.size() + "\n");
     print("red blood cells:" + rbcs.size() + "\n");

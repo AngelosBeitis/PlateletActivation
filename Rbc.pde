@@ -18,10 +18,11 @@ class Rbc extends BloodCont{
         
         PShape rbc = createShape(GROUP);
         
-        PShape body = createShape(ELLIPSE,0,0, this.rad * 2, this.rad * 2);
-        //PShape inner = createShape(ELLIPSE,0,0, this.rad / 2, this.rad / 2);
+        PShape body = createShape(ELLIPSE,0,0, this.rad * 2, this.rad * 2);        
+        PShape inner = createShape(ELLIPSE,0,0, this.rad / 2, this.rad / 2);
+        
         rbc.addChild(body);
-        //rbc.addChild(inner);
+        rbc.addChild(inner);
         this.setShape(rbc);
         //this.setColor(color(255,0,0));
         
