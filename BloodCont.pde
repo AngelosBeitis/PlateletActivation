@@ -2,11 +2,13 @@ abstract class BloodCont extends DwParticle2D{
     
     // fluid velocity
     public float[] fv;
+    public PVector velocity;
     
     BloodCont(PVector l,float rad) {
         super(1,l.x,l.y,rad);
         //fv = new float[2];
         this.setPosition(l.x,l.y);
+        velocity = new PVector(0,0);
         
     }
     
@@ -28,15 +30,16 @@ abstract class BloodCont extends DwParticle2D{
         if (py_grid < 0) py_grid = 0; else if (py_grid >= h_grid) py_grid = h_grid;
         
         int PIDX = py_grid * w_grid + px_grid;
-        fluid_vxy[0] = + fluid_velocity[PIDX * 2] * 0.05f * 1f;
-        fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * 1f; // invert y
+        fluid_vxy[0] = + fluid_velocity[PIDX * 2] * 0.05f * fluidSpeed;
+        fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * fluidSpeed; // invert y
         
         return fluid_vxy;
     }
     // Method to update position
     public void update(float[] fluid_velocity) {
         
-        
+        PVector accel = new PVector(ax,ay);
+        velocity.add(accel);
         this.fv = fluid_velocity;
         this.addForce(fluidVelocity(fv));
         updateShapePosition();
@@ -81,19 +84,15 @@ abstract class BloodCont extends DwParticle2D{
         }
         
     }
-    public void moveTo(float[] cnew) {
+    public void moveToTarget(float[] cnew, float m) {
         PVector position = new PVector(cx,cy);
         PVector target = new PVector(cnew[0],cnew[1]);
         //float distance = dist(this.cx,this.cy,cnew[0],cnew[1]);
         PVector desired = PVector.sub(target,position);
-        float d = desired.mag();
+        //float d = desired.mag();
         desired.normalize();
-        float m = 0.05;
         desired.mult(m);
-        float vx = (cx - px) * ax;
-        float vy = (cy - py) * ay;
-        PVector velocity = new PVector(vx ,vy);
-        //velocity.normalize();
+        
         PVector steer = PVector.sub(desired,velocity);
         
         float[] steerNew = new float[2];

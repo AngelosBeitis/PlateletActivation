@@ -1,12 +1,12 @@
 class Rbc extends BloodCont{
     
-    boolean stuck;
+    public boolean stuck;
     
     Rbc(PVector l) {
         super(l,2);
         stuck = false;
         createShapes();
-        enableCollisions(false);
+        enableCollisions(true);
         
     }
     
@@ -30,12 +30,30 @@ class Rbc extends BloodCont{
         
     }
     
-    public void stickTo(Platelet p) {
-        
-        if (p.activated == true && dist(cx,cy,p.cx,p.cy) < 2) {
+    public void checkStuck() {
+        for (Platelet o : platelets) {
+            // Get distances between the balls components
+            PVector otherPosition = new PVector(o.cx,o.cy);
+            PVector position = new PVector(cx,cy);
+            PVector distanceVect = PVector.sub(otherPosition, position);
             
-            stuck = true;
+            // Calculate magnitude of the vector separating the balls
+            float distanceVectMag = distanceVect.mag();
+            
+            // Minimum distance before they are touching
+            
+            float minDistance = this.rad  + o.rad;
+            if (distanceVectMag < minDistance) {
+                if (o.activated) {
+                    
+                    this.stuck = true;
+                    return;
+                }
+            }
+            else{
+                this.stuck = false;
+            }
+            
         }
     }
-    
 }
