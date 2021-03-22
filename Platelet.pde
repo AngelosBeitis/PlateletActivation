@@ -4,7 +4,8 @@ class Platelet extends BloodCont{
     public PVector positionInDamage;    
     public int time;
     private int flag;
-    private boolean stuckToWall;
+    public boolean stuckToWall;
+    public boolean stuckToPlatelet;
     
     Platelet(PVector l) {
         super(l,1.5);
@@ -13,6 +14,7 @@ class Platelet extends BloodCont{
         enableCollisions(true);
         createShapes();
         stuckToWall = false;
+        stuckToPlatelet = false;
         
     }
     
@@ -25,7 +27,7 @@ class Platelet extends BloodCont{
         }
         float distance = dist(cx,cy,positionInDamage.x,positionInDamage.y);
         distance = distance - this.rad;
-        boolean withinDist = distance < 20;
+        boolean withinDist = distance < 17;
         float moveX = d.position.x;
         float moveY = d.position.y;
         if (withinDist && !this.activated && !this.checkStuck()) {
@@ -42,19 +44,20 @@ class Platelet extends BloodCont{
     }
     
     public boolean scanForProteins() {
-        float distance;
+        float distance;        
         for (Protein p : proteins) {
             float[] cnew = new float[2];
             cnew[0] = p.cx;
             cnew[1] = p.cy;
             
             distance = dist(cx,cy,p.cx,p.cy);
-            if (!activated && distance < 20) {
-                moveToTarget(cnew,0.5);
-                if (distance < 2) {
-                    proteins.remove(p);
-                    scanForProteins();
-                }
+            distance -=(this.rad + p.rad);
+            if (!this.activated && distance < 30) {                
+                moveToTarget(cnew,1);
+            }
+            if (distance < 2) {
+                proteins.remove(p);
+                //scanForProteins();
             }
             return true;
             
@@ -171,6 +174,7 @@ class Platelet extends BloodCont{
                     newo[0] = o.cx;
                     newo[1] = o.cy;
                     this.moveToTarget(newo,0.5);
+                    this.stuckToPlatelet = true;
                     return statement;
                     // float[] newThis = new float[2];
                     // newThis[0] = this.cx;
@@ -181,6 +185,8 @@ class Platelet extends BloodCont{
                 
             }
             else{
+                this.stuckToPlatelet = false;
+                
                 this.flag = 0;
                 this.time = millis();
             }

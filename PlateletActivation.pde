@@ -30,12 +30,16 @@ PApplet papplet;
 float[] bounds;
 PShape obstacles;
 PShape simulationShapes;
-public Plug plug; 
 int stuck = 0;
 int group = 1;
 int displayFluid = 1;
 float fluidSpeed = 1;
-
+float radius = 340 / 2 - 17;
+float px = 840 + 70;
+float py = 340 / 2;
+float plateletRadius = 1.5;
+float rbcRadius = 2;
+float proteinRadius = 1;
 //PShape shapePlatelets;
 PGraphics2D pg_obstacle;
 
@@ -66,6 +70,7 @@ void setup() {
     fluid.param.dissipation_density  = 1f;
     
     // some fluid parameters
+    fluid.param.apply_buoyancy = false;
     fluid.param.dissipation_temperature = 0f;
     fluid.param.timestep = 1;
     fluid.param.num_jacobi_projection = 90;
@@ -76,12 +81,10 @@ void setup() {
     //adding data to the fluid simulation
     fluid.addCallback_FluiData(new  DwFluid2D.FluidData() {
         public void update(DwFluid2D fluid) {
-            float px, py, vx, vy, radius, vscale, r, g, b, intensity;
-            px = width + 70;
-            py = height / 2;
-            vx = - TWO_PI;
+            float  vx, vy,  vscale, r, g, b, intensity;
+            
+            vx = - PI * 5;
             vy = 0;
-            radius = height / 2 - 17;
             intensity = 3;
             fluid.addDensity(px, py, radius, 1, 1, 1, intensity);
             fluid.addVelocity(px, py, radius, vx, vy);
@@ -89,7 +92,7 @@ void setup() {
             
             
         }
-    } );
+    });
     
     
     
@@ -99,7 +102,6 @@ void setup() {
     platelets = new ArrayList<Platelet>();
     proteins = new ArrayList<Protein>();
     
-    plug = new Plug();
     
     bounds = new float[4];
     bounds[0] = 0;
@@ -115,10 +117,10 @@ void setup() {
     //     platelets.add(new Platelet(new PVector(random(0,width), random(height - 35,height - 32.5))));
     //     platelets.add(new Platelet(new PVector(random(0,width), random(32.5,50))));
     
-// }   
+//}   
     // for (int i = 0; i < 20;i++) {
     //     float x = random(damage.left.x + 7, damage.right.x - 7);
-    //     float y = random(damage.top.y,damage.bottom.y);
+    //     float y = damage.top.y;
     //     proteins.add(new Protein(new PVector(x,y)));
 // }
     
@@ -142,7 +144,10 @@ void draw() {
     group = 1;
     RbcMechanics();
     
-    
+    if (frameRate < 5) {
+        println(frameRate);
+        proteins.clear();
+    }
     
     PlateletMechanics();
     //print("activated" + activated + "\n");
@@ -160,7 +165,6 @@ void draw() {
     
     fluid.update();
     fluid_velocity = fluid.getVelocity(fluid_velocity);
-    
     
     DeleteContent();
     CreateContent();
@@ -188,36 +192,35 @@ void PlateletMechanics() {
         }
     }
     for (Platelet p : platelets) {
-        if (p.activated) {
+        if (p.activated && (p.stuckToPlatelet || p.stuckToWall)) {
             obstacles.addChild(p.getShape());
         }
-        if (!p.scan(damage) && !p.activated)
+        if (!p.scan(damage))
             p.scanForProteins();
-        // if (p.getVelocity()<0.0005 && p.getVelocity()>0) {
-        //     print(p.getVelocity(),"\n");
-    // }
+        if (p.getVelocity()<0.0005 && p.getVelocity()>0) {
+        }
         
-        // if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
-        //     for (Platelet i : platelets) {
-        //         if (i.activated) {
-        //             for (int j = 0;j < 1;j++) {
-        //                 proteins.add(new Protein(new PVector(i.cx,i.cy)));
-        //             }
-        //         }
-        //     }
-        //     currentTime2 = millis() / 1000;
-        //     flag2 = 1;
-    // }
-        // if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 1) {
-        //     for (Platelet i : platelets) {
-        //         if (i.activated) {
-        //             for (int j = 0;j < 1;j++)
-        //                 proteins.add(new Protein(new PVector(i.cx,i.cy)));
-        //         }
-        //     }
-        //     currentTime2 = millis() / 1000;
-        //     flag2 = 0;
-    // }
+        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
+            for (Platelet i : platelets) {
+                if (i.activated) {
+                    for (int j = 0;j < 1;j++) {
+                        proteins.add(new Protein(new PVector(i.cx,i.cy)));
+                    }
+                }
+            }
+            currentTime2 = millis() / 1000;
+            flag2 = 1;
+        }
+        if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 1) {
+            for (Platelet i : platelets) {
+                if (i.activated) {
+                    for (int j = 0;j < 1;j++)
+                        proteins.add(new Protein(new PVector(i.cx,i.cy)));
+                }
+            }
+            currentTime2 = millis() / 1000;
+            flag2 = 0;
+        }
         p.checkBoundary();
         p.checkStuck();
         //if(p.activated) p.collision(platelets);
@@ -302,6 +305,9 @@ void CreateContent() {
             //platelets.add(new Platelet(new PVector(width + 5, random(33,height - 33))));
             platelets.add(new Platelet(new PVector(width + 5, random(33,50))));
             platelets.add(new Platelet(new PVector(width + 5, random(height - 33,height - 50))));
+            float x = random(damage.left.x + 7, damage.right.x - 7);
+            float y = damage.top.y + proteinRadius;
+            proteins.add(new Protein(new PVector(x,y)));
         }
         currentTime = millis() / 1000;
         flag = 1;
@@ -380,7 +386,7 @@ void controlSetup() {
     sx = 100; sy = 14; oy = (int)(sy * 1.5f);
     Group group_fluid = controlP5.addGroup("fluid");
     {
-        group_fluid.setHeight(20).setSize(gui_w, 200)
+        group_fluid.setHeight(20).setSize(gui_w, 260)
            .setBackgroundColor(color(16, 180)).setColorBackground(color(16, 180));
         group_fluid.getCaptionLabel().align(CENTER, CENTER);
         
@@ -388,14 +394,23 @@ void controlSetup() {
         
         px = 10;
         
-        controlP5.addSlider("velocity").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=(int)(oy * 0.5f))
-           .setRange(0, 10).setValue(fluid.param.dissipation_velocity).plugTo(fluid.param, "dissipation_velocity");
+        controlP5.addSlider("velocity").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=(int)(oy * 0.5f) - 20)
+           .setRange(0, 1).setValue(fluid.param.dissipation_velocity).plugTo(fluid.param, "dissipation_velocity");
         
         controlP5.addSlider("Fluid Speed").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=oy)
-           .setRange(0, 10).setValue(fluidSpeed).plugTo(this,"fluidSpeed");
+           .setRange(0, 100).setValue(fluidSpeed).plugTo(this,"fluidSpeed");
+        
+        controlP5.addSlider("Fluid position x").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=oy)
+           .setRange(width, 1000).setValue(this.px).plugTo(this,"px");
+        
+        controlP5.addSlider("Fluid position y").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=oy)
+           .setRange(0, 1000).setValue(this.py).plugTo(this,"py");
+        
+        controlP5.addSlider("Fluid Radius").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=oy)
+           .setRange(0, 300).setValue(radius).plugTo(this,"radius");
         
         controlP5.addSlider("density").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=oy)
-           .setRange(0, 10).setValue(fluid.param.dissipation_density).plugTo(fluid.param, "dissipation_density");
+           .setRange(0, 1).setValue(fluid.param.dissipation_density).plugTo(fluid.param, "dissipation_density");
         
         controlP5.addSlider("temperature").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=oy)
            .setRange(0, 1).setValue(fluid.param.dissipation_temperature).plugTo(fluid.param, "dissipation_temperature");
@@ -432,7 +447,6 @@ void controlSetup() {
         group_particles.getCaptionLabel().align(CENTER, CENTER);
         
         sx = 100; px = 10; py = 10;oy = (int)(sy * 1.4f);
-        
         controlP5.addButton("+").setGroup(group_particles).plugTo(this, "amount_increase").setSize(39, 18).setPosition(px, py);
         controlP5.addButton("-").setGroup(group_particles).plugTo(this, "amount_decrease").setSize(39, 18).setPosition(px += 50, py);
         

@@ -3,8 +3,8 @@ class Protein extends BloodCont{
     Protein(PVector l) {
         
         super(l,1);   
-        ax = random( - 1,1);
-        ay = random(0,1);   
+        ax = 0;
+        ay = 0.005;   
         // will make them stay close to the damaged area
         //mass = 2;
         enableCollisions(false);        

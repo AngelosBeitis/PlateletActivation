@@ -46,7 +46,6 @@ abstract class BloodCont extends DwParticle2D{
         updatePosition(1);
         
     }
-    //abstract void createShapes();
     
     public void checkBoundary() {
         //bottom boundary
@@ -91,7 +90,9 @@ abstract class BloodCont extends DwParticle2D{
         PVector desired = PVector.sub(target,position);
         //float d = desired.mag();
         desired.normalize();
-        desired.mult(m);
+        PVector newV = new PVector(0.05,0.05);
+        desired.sub(newV);
+        //desired.mult(m);
         
         PVector steer = PVector.sub(desired,velocity);
         
