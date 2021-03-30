@@ -90,9 +90,9 @@ abstract class BloodCont extends DwParticle2D{
         PVector desired = PVector.sub(target,position);
         //float d = desired.mag();
         desired.normalize();
-        PVector newV = new PVector(0.05,0.05);
-        desired.sub(newV);
-        //desired.mult(m);
+        // PVector newV = new PVector(0.05,0.05);
+        // desired.sub(newV);
+        desired.mult(m);
         
         PVector steer = PVector.sub(desired,velocity);
         
