@@ -7,6 +7,8 @@ import com.thomasdiewald.pixelflow.java.softbodydynamics.particle.DwParticle2D;
 ControlP5 controlP5;
 
 boolean debug = true;
+//no slip condition
+int nsc = 1;
 color[] colors = new color[7]; 
 // Flowfield object
 Background back;
@@ -32,7 +34,7 @@ PShape obstacles;
 PShape simulationShapes;
 int stuck = 0;
 int group = 1;
-int displayFluid = 1;
+int displayFluid = 0;
 float fluidSpeed = 1;
 float radius = 340 / 2 - 17;
 float px = 840 + 70;
@@ -40,6 +42,10 @@ float py = 340 / 2;
 float plateletRadius = 1.5;
 float rbcRadius = 2;
 float proteinRadius = 1;
+int damagePosition = 10;
+int endotheliumCount = 20;
+int damagePositionCheck = damagePosition;
+int endotheliumCheck = endotheliumCount;
 //PShape shapePlatelets;
 PGraphics2D pg_obstacle;
 
@@ -74,7 +80,6 @@ void setup() {
     fluid.param.dissipation_temperature = 0f;
     fluid.param.timestep = 1;
     fluid.param.num_jacobi_projection = 90;
-    fluid.param.vorticity = 0;
     fluid.param.gridscale = 0.1;
     //fluid.simulation_step = 10;
     
@@ -97,7 +102,7 @@ void setup() {
     
     
     // Make a new flow field with "resolution" of 20
-    back = new Background(10,20);
+    back = new Background(damagePosition,endotheliumCount);
     rbcs = new ArrayList<Rbc>();
     platelets = new ArrayList<Platelet>();
     proteins = new ArrayList<Protein>();
@@ -143,7 +148,6 @@ void draw() {
     simulationShapes.addChild(back.sim);
     group = 1;
     RbcMechanics();
-    
     if (frameRate < 5) {
         println(frameRate);
         proteins.clear();
@@ -152,7 +156,12 @@ void draw() {
     PlateletMechanics();
     //print("activated" + activated + "\n");
     Physics();
-    
+    if (endotheliumCheck!= endotheliumCount || damagePositionCheck != damagePosition) {
+        endotheliumCheck = endotheliumCount;
+        damagePositionCheck = damagePosition;
+        back = new Background(damagePosition,endotheliumCount);
+        
+    }
     ProteinMechanics();
     //if (activated > 0) simulationShapes.addChild(plug.shape);
     
@@ -168,7 +177,7 @@ void draw() {
     
     DeleteContent();
     CreateContent();
-    if (displayFluid == 1) {
+    if (displayFluid == 0) {
         pg_fluid.beginDraw();
         pg_fluid.endDraw();
         
@@ -415,9 +424,6 @@ void controlSetup() {
         controlP5.addSlider("temperature").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=oy)
            .setRange(0, 1).setValue(fluid.param.dissipation_temperature).plugTo(fluid.param, "dissipation_temperature");
         
-        controlP5.addSlider("vorticity").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=oy)
-           .setRange(0, 1).setValue(fluid.param.vorticity).plugTo(fluid.param, "vorticity");
-        
         controlP5.addSlider("iterations").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=oy)
            .setRange(0, 100).setValue(fluid.param.num_jacobi_projection).plugTo(fluid.param, "num_jacobi_projection");
         
@@ -428,7 +434,7 @@ void controlSetup() {
            .setRange(0, 50).setValue(fluid.param.gridscale).plugTo(fluid.param, "gridscale");
         
         controlP5.addRadio("fluid_display").setGroup(group_fluid).setSize(sy,sy).setPosition(px, py +=oy)
-           .addItem("Display Fluid", 1)
+           .addItem("Display Fluid", 0)
            .activate(displayFluid);
         
         
@@ -448,7 +454,14 @@ void controlSetup() {
         
         sx = 100; px = 10; py = 10;oy = (int)(sy * 1.4f);
         controlP5.addButton("+").setGroup(group_particles).plugTo(this, "amount_increase").setSize(39, 18).setPosition(px, py);
-        controlP5.addButton("-").setGroup(group_particles).plugTo(this, "amount_decrease").setSize(39, 18).setPosition(px += 50, py);
+        controlP5.addButton("-").setGroup(group_particles).plugTo(this, "amount_decrease").setSize(39, 18).setPosition(px + 50, py);
+        controlP5.addSlider("endothelium").setGroup(group_particles).setSize(sx, sy).setPosition(px, py +=oy)
+           .setRange(damagePosition, 20).setValue(endotheliumCount).plugTo(this,"endotheliumCount");    
+        controlP5.addSlider("damaged position").setGroup(group_particles).setSize(sx, sy).setPosition(px, py +=oy)
+           .setRange(1, endotheliumCount).setValue(damagePosition).plugTo(this,"damagePosition");            
+        controlP5.addRadio("noSlipCondition").setGroup(group_particles).setSize(39, 18).setPosition(px, py += 50)
+           .addItem("No-slip condition",0)
+           .activate(nsc);
         
         
     }
@@ -466,6 +479,7 @@ void controlSetup() {
     
     
 }
+
 void amount_increase() {
     amounts++;
     
@@ -479,4 +493,6 @@ void amount_decrease() {
 void fluid_display(int i) {
     displayFluid = i;
 }
-
+void noSlipCondition(int i) {
+    nsc = i;
+}

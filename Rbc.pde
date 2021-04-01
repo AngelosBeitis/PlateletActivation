@@ -3,7 +3,7 @@ class Rbc extends BloodCont{
     public boolean stuck;
     
     Rbc(PVector l) {
-        super(l,2);
+        super(l,2.2);
         stuck = false;
         createShapes();
         enableCollisions(true);
@@ -14,7 +14,7 @@ class Rbc extends BloodCont{
         
         stroke(0);
         pushMatrix();
-        fill(255,0,0);
+        fill(180,0,0);
         
         PShape rbc = createShape(GROUP);
         

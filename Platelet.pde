@@ -1,7 +1,6 @@
 class Platelet extends BloodCont{
     
     public boolean activated;
-    public PVector positionInDamage;    
     public int time;
     private int flag;
     public boolean stuckToWall;
@@ -20,23 +19,18 @@ class Platelet extends BloodCont{
     
     
     public boolean scan(Damage d) {
-        if (positionInDamage == null) {
-            float newX = random(d.left.x + 7, d.right.x - 7);
-            float newY = d.top.y + 2.5;
-            positionInDamage = new PVector(newX,newY);
-        }
-        float distance = dist(cx,cy,positionInDamage.x,positionInDamage.y);
+        
+        float distance = cy - d.top.y;
         distance = distance - this.rad;
-        boolean withinDist = distance < 17;
-        float moveX = d.position.x;
-        float moveY = d.position.y;
-        if (withinDist && !this.activated && !this.checkStuck()) {
+        boolean withinDist = distance < 10;
+        
+        if (withinDist && !this.activated && !this.checkStuck()) {            
             float[] cnew = new float[2];
-            cnew[0] = positionInDamage.x;
-            cnew[1] = positionInDamage.y;
+            cnew[0] = cx;
+            cnew[1] = d.top.y;
             moveToTarget(cnew,0.5);
             //activate at the damaged area
-            if (distance < 0.2 && activated == false)
+            if (distance < 1 && activated == false)
                 activate();
         }
         return withinDist;
@@ -52,12 +46,12 @@ class Platelet extends BloodCont{
             
             distance = dist(cx,cy,p.cx,p.cy);
             distance -=(this.rad + p.rad);
-            if (!this.activated && distance < 30) {                
+            if (!this.activated && distance < 17) {                
                 moveToTarget(cnew,1);
             }
             if (distance < 2) {
                 proteins.remove(p);
-                //scanForProteins();
+                scanForProteins();
             }
             return true;
             

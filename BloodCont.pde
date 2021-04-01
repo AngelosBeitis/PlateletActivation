@@ -51,11 +51,24 @@ abstract class BloodCont extends DwParticle2D{
         //bottom boundary
         if (cy > height - this.rad - 30) {
             cy = height - this.rad - 30;
+            //no-slip condition
+            if (nsc == 0) {
+                cx = px;
+                ax = 0;
+                ay = 0;
+            }
+            
             
         }
         //top boundary
         if (cy < 30 + this.rad && (cx < damage.left.x - this.rad || cx > damage.right.x + this.rad)) {
             cy = 30 + this.rad;
+            //no-slip condition
+            if (nsc == 0) {
+                cx = px;
+                ax = 0;
+                ay = 0;
+            }
         }
         // within damaged cell
         if (cx > damage.left.x - this.rad && cx < damage.right.x + this.rad) {
