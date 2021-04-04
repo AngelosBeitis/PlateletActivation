@@ -36,9 +36,11 @@ int stuck = 0;
 int group = 1;
 int displayFluid = 0;
 float fluidSpeed = 1;
-float radius = 340 / 2 - 17;
-float px = 840 + 70;
-float py = 340 / 2;
+int gridSizeX = 840;
+int gridSizeY = 340;
+float radius = gridSizeY / 2 - 17;
+float px = gridSizeX + 70;
+float py = gridSizeY / 2;
 float plateletRadius = 1.5;
 float rbcRadius = 2;
 float proteinRadius = 1;
@@ -62,14 +64,13 @@ void setup() {
     frameRate(120);
     
     param_physics.GRAVITY = new float[]{0, 0};
-    param_physics.bounds  = new float[]{ - 100, - 500, width + 500, height + 500}; // implement so the bounving effect of the library doesnt happen
+    param_physics.bounds  = new float[]{ - 100, - 500, width + 500, height + 500}; 
     param_physics.iterations_collisions = 3;
     param_physics.iterations_springs    = 0; // no springs in this demo
     
     physics = new DwPhysics<DwParticle2D>(param_physics);
     
     DwPixelFlow context = new DwPixelFlow(this);
-    //print(displayHeight + " " + displayWidth + " " + height + " " + width + "\n");
     fluid = new Fluid(context, width, height, 1);
     
     fluid.param.dissipation_velocity = 1;
@@ -100,8 +101,7 @@ void setup() {
     } );
     
     
-    
-    // Make a new flow field with "resolution" of 20
+    // create the background along with the ArrayLists where the particles will be stored in 
     back = new Background(damagePosition,endotheliumCount);
     rbcs = new ArrayList<Rbc>();
     platelets = new ArrayList<Platelet>();
@@ -148,14 +148,15 @@ void draw() {
     simulationShapes.addChild(back.sim);
     group = 1;
     RbcMechanics();
+    // clear proteins so the simulation doesn't come to a hault due to extreme frame drops
     if (frameRate < 5) {
         println(frameRate);
         proteins.clear();
     }
     
     PlateletMechanics();
-    //print("activated" + activated + "\n");
     Physics();
+    //re create the background in case there has been a change through the GUI
     if (endotheliumCheck!= endotheliumCount || damagePositionCheck != damagePosition) {
         endotheliumCheck = endotheliumCount;
         damagePositionCheck = damagePosition;
@@ -163,8 +164,8 @@ void draw() {
         
     }
     ProteinMechanics();
-    //if (activated > 0) simulationShapes.addChild(plug.shape);
     
+    //add obstacles to the simulation
     pg_obstacle.noSmooth();
     pg_obstacle.beginDraw();
     pg_obstacle.clear();
@@ -175,8 +176,12 @@ void draw() {
     fluid.update();
     fluid_velocity = fluid.getVelocity(fluid_velocity);
     
+    //delete particles which are out of the grid
     DeleteContent();
+    
+    //create new particles at the right part of the screen(rbcs,platelets,proteins)
     CreateContent();
+    //display the fluid if the button on the GUI is on
     if (displayFluid == 0) {
         pg_fluid.beginDraw();
         pg_fluid.endDraw();
@@ -192,6 +197,7 @@ void draw() {
 }
 
 void PlateletMechanics() {
+    //set collision group to activated platelets so that they can collide with other particles
     for (Platelet p : platelets) {
         if (!p.activated)
             p.setCollisionGroup(0);
@@ -201,14 +207,17 @@ void PlateletMechanics() {
         }
     }
     for (Platelet p : platelets) {
+        //add activated platelets to the obstacle so that we can see flow dissruption
         if (p.activated && (p.stuckToPlatelet || p.stuckToWall)) {
             obstacles.addChild(p.getShape());
         }
-        if (!p.scan(damage))
+        if (!p.scan(damage) && !p.activated)
             p.scanForProteins();
+        
+        //implement shear rate activation
         if (p.getVelocity()<0.0005 && p.getVelocity()>0) {
         }
-        
+        //generate proteins at the location of activated platelets acting as signaling
         if ((millis() / 1000) - currentTime2 >= 2 && flag2 == 0) {
             for (Platelet i : platelets) {
                 if (i.activated) {
@@ -232,15 +241,14 @@ void PlateletMechanics() {
         }
         p.checkBoundary();
         p.checkStuck();
-        //if(p.activated) p.collision(platelets);
         p.update(fluid_velocity);
-        //if (!p.activated) 
         simulationShapes.addChild(p.getShape());
         
     }
     
 }
 void RbcMechanics() {
+    //add rbc to collision group if that rbc is in contact with an activated platelet to show flow dissruption
     for (Rbc r : rbcs) {
         if (r.stuck) {
             r.setCollisionGroup(group);
@@ -276,7 +284,6 @@ void Physics() {
         platelets.toArray(plateletArray);
         rbcs.toArray(rbcArray);
         
-        // List<Platelet> activatedList = new ArrayList<Platelet>();
         List<BloodCont> list = new ArrayList<BloodCont>();
         for (int i = 0;i < rbcArray.length;i++) {
             if (rbcArray[i].stuck) {
@@ -289,8 +296,7 @@ void Physics() {
         }
         BloodCont[] finalArray = new BloodCont[list.size()];
         list.toArray(finalArray);
-        // Platelet[] activatedArray = new Platelet[activatedList.size()];
-        // activatedList.toArray(activatedArray);
+        
         physics.param.GRAVITY[1] = 0;
         physics.update_particle_shapes = false;
         physics.param.iterations_springs    = 0;
@@ -308,10 +314,9 @@ void CreateContent() {
     rbcs.add(new Rbc(new PVector(width + 5, random(35,height - 35))));
     
     
-    // add platelets everey 5 seconds
+    // add platelets every 5 seconds
     if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
         for (int i = 0;i < amounts;i++) {
-            //platelets.add(new Platelet(new PVector(width + 5, random(33,height - 33))));
             platelets.add(new Platelet(new PVector(width + 5, random(33,50))));
             platelets.add(new Platelet(new PVector(width + 5, random(height - 33,height - 50))));
             float x = random(damage.left.x + 7, damage.right.x - 7);
@@ -325,7 +330,6 @@ void CreateContent() {
         for (int i = 0;i < amounts;i++) {
             platelets.add(new Platelet(new PVector(width + 5, random(33,50))));
             platelets.add(new Platelet(new PVector(width + 5, random(height - 33,height - 50))));            
-            //platelets.add(new Platelet(new PVector(width + 5, random(33,height - 33))));
             
         }
         currentTime = millis() / 1000;
@@ -393,9 +397,12 @@ void controlSetup() {
     int sx, sy, px, py, oy;
     
     sx = 100; sy = 14; oy = (int)(sy * 1.5f);
+    ////////////////////////////////////////////////////////////////////////////
+    // GUI - FLUID
+    ////////////////////////////////////////////////////////////////////////////
     Group group_fluid = controlP5.addGroup("fluid");
     {
-        group_fluid.setHeight(20).setSize(gui_w, 260)
+        group_fluid.setHeight(20).setSize(gui_w, 250)
            .setBackgroundColor(color(16, 180)).setColorBackground(color(16, 180));
         group_fluid.getCaptionLabel().align(CENTER, CENTER);
         
@@ -448,7 +455,7 @@ void controlSetup() {
     Group group_particles = controlP5.addGroup("Particles");
     {
         
-        group_particles.setHeight(20).setSize(gui_w, 5)
+        group_particles.setHeight(20).setSize(gui_w, 200)
            .setBackgroundColor(color(16, 180)).setColorBackground(color(16, 180));
         group_particles.getCaptionLabel().align(CENTER, CENTER);
         

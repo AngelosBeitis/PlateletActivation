@@ -20,11 +20,5 @@ class Damage{
         height = dist(top.x,top.y,bottom.x,bottom.y);
     }
     
-    public void createShapes() {
-        
-        
-        
-        
-        
-    }
+    
 }

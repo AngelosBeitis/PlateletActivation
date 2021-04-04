@@ -6,7 +6,6 @@ abstract class BloodCont extends DwParticle2D{
     
     BloodCont(PVector l,float rad) {
         super(1,l.x,l.y,rad);
-        //fv = new float[2];
         this.setPosition(l.x,l.y);
         velocity = new PVector(0,0);
         
@@ -57,8 +56,7 @@ abstract class BloodCont extends DwParticle2D{
                 ax = 0;
                 ay = 0;
             }
-            
-            
+              
         }
         //top boundary
         if (cy < 30 + this.rad && (cx < damage.left.x - this.rad || cx > damage.right.x + this.rad)) {

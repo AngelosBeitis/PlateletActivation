@@ -32,12 +32,12 @@ class Rbc extends BloodCont{
     
     public void checkStuck() {
         for (Platelet o : platelets) {
-            // Get distances between the balls components
+            // Get distances between particles
             PVector otherPosition = new PVector(o.cx,o.cy);
             PVector position = new PVector(cx,cy);
             PVector distanceVect = PVector.sub(otherPosition, position);
             
-            // Calculate magnitude of the vector separating the balls
+            // Calculate magnitude of the vector separating the particles
             float distanceVectMag = distanceVect.mag();
             
             // Minimum distance before they are touching
@@ -47,6 +47,10 @@ class Rbc extends BloodCont{
                 if (o.activated) {
                     
                     this.stuck = true;
+                    float[] cnew = new float[2];
+                    cnew[0] = o.cx;
+                    cnew[1] = o.cy;
+                    moveToTarget(cnew,0.5);
                     return;
                 }
             }
