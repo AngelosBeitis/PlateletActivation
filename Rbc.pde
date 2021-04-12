@@ -50,7 +50,7 @@ class Rbc extends BloodCont{
                     float[] cnew = new float[2];
                     cnew[0] = o.cx;
                     cnew[1] = o.cy;
-                    moveToTarget(cnew,0.5);
+                    moveToTarget(cnew,0.005);
                     return;
                 }
             }

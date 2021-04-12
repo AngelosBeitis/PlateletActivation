@@ -4,7 +4,7 @@ class Protein extends BloodCont{
         
         super(l,1);   
         ax = 0;
-        ay = 0.005;   
+        ay = 0;   
         // will make them stay close to the damaged area
         //mass = 2;
         enableCollisions(false);        
@@ -13,7 +13,6 @@ class Protein extends BloodCont{
     
     public void createShapes() {
         
-        //float theta = velocity.heading2D() + radians(90);
         pushMatrix();
         fill(0,255,0);
         

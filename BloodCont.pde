@@ -56,7 +56,7 @@ abstract class BloodCont extends DwParticle2D{
                 ax = 0;
                 ay = 0;
             }
-              
+            
         }
         //top boundary
         if (cy < 30 + this.rad && (cx < damage.left.x - this.rad || cx > damage.right.x + this.rad)) {
@@ -90,7 +90,23 @@ abstract class BloodCont extends DwParticle2D{
         }
         if (cx > damage.right.x - this.rad && cy < 30 + this.rad) {
             cx = damage.right.x - this.rad;
-            
+        }
+        if (stenosis == 0) {
+            float alpha = (a[1] - b[1]) / (a[0] - b[0]);
+            float vita = (c[1] - d[1])/( c[0] - d[0] );
+            float function = alpha * cx + (a[1] - a[0] * alpha);
+            float function2 = vita * cx + (c[1]-c[0]*vita);
+            if(function2 - cy < 0 && cy > c[1] && cx < a[0]){
+              //cy = function2;
+              cx=px;
+            }
+            if ((function - cy - this.rad < 0 && cy+ this.rad > a[1] && cx+this.rad > c[0])){
+                //cy = function;
+                cx = px;
+            }
+            if((cx<a[0] && cx>c[0]) && cy>c[1]){
+              cy = c[1];
+            }
         }
         
     }

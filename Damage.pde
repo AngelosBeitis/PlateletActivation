@@ -20,5 +20,10 @@ class Damage{
         height = dist(top.x,top.y,bottom.x,bottom.y);
     }
     
-    
+    public void display() {
+        strokeWeight(5);
+        stroke(0,100,255);
+        line(left.x, top.y, right.x, top.y);
+        strokeWeight(1);
+    }
 }

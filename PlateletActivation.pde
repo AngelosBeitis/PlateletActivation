@@ -48,6 +48,12 @@ int damagePosition = 10;
 int endotheliumCount = 20;
 int damagePositionCheck = damagePosition;
 int endotheliumCheck = endotheliumCount;
+int stenosis = 1;
+float[] a = new float[2];
+float[] b = new float[2];
+float[] c = new float[2];
+float[] d = new float[2];
+
 //PShape shapePlatelets;
 PGraphics2D pg_obstacle;
 
@@ -58,12 +64,20 @@ DwPhysics<DwParticle2D> physics;
 void setup() {
     //size(330,260);
     colorMode(RGB);
+    a[0] = 491;
+    a[1] = 99;
+    b[0] = 571;
+    b[1] = gridSizeY - 30;
+    c[0] = 370;
+    c[1] = 99;
+    d[0] = 283;
+    d[1] = gridSizeY - 30;
     controlP5 = new ControlP5(this);
     
     size(840, 340,P2D);
     frameRate(120);
     
-    param_physics.GRAVITY = new float[]{0, 0};
+    param_physics.GRAVITY = new float[]{0, 0}; //no gravity
     param_physics.bounds  = new float[]{ - 100, - 500, width + 500, height + 500}; 
     param_physics.iterations_collisions = 3;
     param_physics.iterations_springs    = 0; // no springs in this demo
@@ -87,7 +101,7 @@ void setup() {
     //adding data to the fluid simulation
     fluid.addCallback_FluiData(new  DwFluid2D.FluidData() {
         public void update(DwFluid2D fluid) {
-            float  vx, vy,  vscale, r, g, b, intensity;
+            float  vx, vy, intensity;
             
             vx = - PI * 5;
             vy = 0;
@@ -98,7 +112,7 @@ void setup() {
             
             
         }
-    } );
+    });
     
     
     // create the background along with the ArrayLists where the particles will be stored in 
@@ -191,6 +205,7 @@ void draw() {
     }
     
     //display shapes of the screen
+    damage.display();
     shape(simulationShapes);  
     
     
@@ -286,8 +301,13 @@ void Physics() {
         
         List<BloodCont> list = new ArrayList<BloodCont>();
         for (int i = 0;i < rbcArray.length;i++) {
-            if (rbcArray[i].stuck) {
+            if (stenosis == 0) {
                 list.add(rbcArray[i]);
+            }
+            else{
+                if (rbcArray[i].stuck) {
+                    list.add(rbcArray[i]);
+                }
             }
         }
         
@@ -384,6 +404,7 @@ void mouseClicked() {
     // print("Platelets:" + platelets.size() + "\n");
     // print("red blood cells:" + rbcs.size() + "\n");
     
+    //println(mouseX + " " + mouseY);
     
     
 }
@@ -398,17 +419,37 @@ void controlSetup() {
     
     sx = 100; sy = 14; oy = (int)(sy * 1.5f);
     ////////////////////////////////////////////////////////////////////////////
+    // GUI - SIMULATION
+    ////////////////////////////////////////////////////////////////////////////
+    Group group_simulation = controlP5.addGroup("Simulation");
+    {
+        px = 10; py = 15;
+        group_simulation.setHeight(20).setSize(gui_w, 100)
+           .setBackgroundColor(color(16, 180)).setColorBackground(color(16, 180));
+        group_simulation.getCaptionLabel().align(CENTER, CENTER);
+        
+        controlP5.addSlider("endothelium").setGroup(group_simulation).setSize(sx, sy).setPosition(px, py - 10)
+           .setRange(damagePosition, 20).setValue(endotheliumCount).plugTo(this,"endotheliumCount");    
+        controlP5.addSlider("damaged position").setGroup(group_simulation).setSize(sx, sy).setPosition(px, py +=oy)
+           .setRange(1, endotheliumCount).setValue(damagePosition).plugTo(this,"damagePosition");            
+        controlP5.addRadio("noSlipCondition").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
+           .addItem("No-slip condition",0)
+           .activate(nsc);
+        controlP5.addRadio("stenosiSimulation").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
+           .addItem("Stenosis simulation",0)
+           .activate(stenosis);
+        
+    }
+    ////////////////////////////////////////////////////////////////////////////
     // GUI - FLUID
     ////////////////////////////////////////////////////////////////////////////
-    Group group_fluid = controlP5.addGroup("fluid");
+    Group group_fluid = controlP5.addGroup("Fluid");
     {
         group_fluid.setHeight(20).setSize(gui_w, 250)
            .setBackgroundColor(color(16, 180)).setColorBackground(color(16, 180));
         group_fluid.getCaptionLabel().align(CENTER, CENTER);
         
         px = 10; py = 15;
-        
-        px = 10;
         
         controlP5.addSlider("velocity").setGroup(group_fluid).setSize(sx, sy).setPosition(px, py +=(int)(oy * 0.5f) - 20)
            .setRange(0, 1).setValue(fluid.param.dissipation_velocity).plugTo(fluid.param, "dissipation_velocity");
@@ -460,15 +501,8 @@ void controlSetup() {
         group_particles.getCaptionLabel().align(CENTER, CENTER);
         
         sx = 100; px = 10; py = 10;oy = (int)(sy * 1.4f);
-        controlP5.addButton("+").setGroup(group_particles).plugTo(this, "amount_increase").setSize(39, 18).setPosition(px, py);
-        controlP5.addButton("-").setGroup(group_particles).plugTo(this, "amount_decrease").setSize(39, 18).setPosition(px + 50, py);
-        controlP5.addSlider("endothelium").setGroup(group_particles).setSize(sx, sy).setPosition(px, py +=oy)
-           .setRange(damagePosition, 20).setValue(endotheliumCount).plugTo(this,"endotheliumCount");    
-        controlP5.addSlider("damaged position").setGroup(group_particles).setSize(sx, sy).setPosition(px, py +=oy)
-           .setRange(1, endotheliumCount).setValue(damagePosition).plugTo(this,"damagePosition");            
-        controlP5.addRadio("noSlipCondition").setGroup(group_particles).setSize(39, 18).setPosition(px, py += 50)
-           .addItem("No-slip condition",0)
-           .activate(nsc);
+        controlP5.addSlider("platelets generated").setGroup(group_particles).setRange(0, 20).setValue(amounts).setSize(sx,sy).setPosition(px, py).plugTo(this,"amounts");
+        
         
         
     }
@@ -479,6 +513,7 @@ void controlSetup() {
     ////////////////////////////////////////////////////////////////////////////
     controlP5.addAccordion("acc").setPosition(gui_x, gui_y).setWidth(gui_w).setSize(gui_w, height)
        .setCollapseMode(Accordion.MULTI)
+       .addItem(group_simulation)
        .addItem(group_fluid)
        .addItem(group_particles)
        .open(0);
@@ -487,19 +522,15 @@ void controlSetup() {
     
 }
 
-void amount_increase() {
-    amounts++;
-    
-}
-void amount_decrease() {
-    if (amounts > 0) {
-        amounts--;
-    }
-    
-}
 void fluid_display(int i) {
     displayFluid = i;
 }
 void noSlipCondition(int i) {
     nsc = i;
+}
+void stenosiSimulation(int i) {
+    stenosis = i;
+    back = new Background(damagePosition,endotheliumCount);
+    
+    
 }

@@ -170,11 +170,7 @@ class Platelet extends BloodCont{
                     this.moveToTarget(newo,0.5);
                     this.stuckToPlatelet = true;
                     return statement;
-                    // float[] newThis = new float[2];
-                    // newThis[0] = this.cx;
-                    // newThis[1] = this.cy;
-                    // statement = true;
-                    //o.moveTo(newThis,0.005);    
+                    
                 }
                 
             }
