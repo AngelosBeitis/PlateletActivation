@@ -50,6 +50,7 @@ int damagePositionCheck = damagePosition;
 int endotheliumCheck = endotheliumCount;
 int stenosis = 1;
 int rbcAmount = 2;
+int allowCollision = 1;
 float[] a = new float[2];
 float[] b = new float[2];
 float[] c = new float[2];
@@ -113,7 +114,7 @@ void setup() {
             
             
         }
-    } );
+    });
     
     
     // create the background along with the ArrayLists where the particles will be stored in 
@@ -193,7 +194,6 @@ void draw() {
     
     //delete particles which are out of the grid
     DeleteContent();
-    
     //create new particles at the right part of the screen(rbcs,platelets,proteins)
     CreateContent();
     //display the fluid if the button on the GUI is on
@@ -266,7 +266,12 @@ void PlateletMechanics() {
 void RbcMechanics() {
     //add rbc to collision group if that rbc is in contact with an activated platelet to show flow dissruption
     for (Rbc r : rbcs) {
-        if (r.stuck) {
+        if (allowCollision != 0) {
+            if (r.stuck) {
+                r.setCollisionGroup(group);
+                group++;
+            }
+        } else{
             r.setCollisionGroup(group);
             group++;
         }
@@ -302,7 +307,7 @@ void Physics() {
         
         List<BloodCont> list = new ArrayList<BloodCont>();
         for (int i = 0;i < rbcArray.length;i++) {
-            if (stenosis == 0) {
+            if (stenosis == 0 || allowCollision == 0) {
                 list.add(rbcArray[i]);
             }
             else{
@@ -422,11 +427,11 @@ void controlSetup() {
     Group group_simulation = controlP5.addGroup("Simulation");
     {
         px = 10; py = 15;
-        group_simulation.setHeight(20).setSize(gui_w, 100)
+        group_simulation.setHeight(20).setSize(gui_w, 140)
            .setBackgroundColor(color(16, 180)).setColorBackground(color(16, 180));
         group_simulation.getCaptionLabel().align(CENTER, CENTER);
         
-        controlP5.addSlider("endothelium").setGroup(group_simulation).setSize(sx, sy).setPosition(px, py - 10)
+        controlP5.addSlider("endothelium cells").setGroup(group_simulation).setSize(sx, sy).setPosition(px, py - 10)
            .setRange(damagePosition, 20).setValue(endotheliumCount).plugTo(this,"endotheliumCount");    
         controlP5.addSlider("damaged position").setGroup(group_simulation).setSize(sx, sy).setPosition(px, py +=oy)
            .setRange(1, endotheliumCount).setValue(damagePosition).plugTo(this,"damagePosition");            
@@ -436,6 +441,9 @@ void controlSetup() {
         controlP5.addRadio("stenosiSimulation").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
            .addItem("Stenosis simulation",0)
            .activate(stenosis);
+        controlP5.addRadio("particleCollision").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
+           .addItem("Particle collision",0)
+           .activate(allowCollision);
         
     }
     ////////////////////////////////////////////////////////////////////////////
@@ -522,6 +530,9 @@ void controlSetup() {
 
 void fluid_display(int i) {
     displayFluid = i;
+}
+void particleCollision(int i) {
+    allowCollision = i;
 }
 void noSlipCondition(int i) {
     nsc = i;
