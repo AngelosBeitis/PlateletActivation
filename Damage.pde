@@ -24,6 +24,7 @@ class Damage{
         strokeWeight(5);
         stroke(0,100,255);
         line(left.x, top.y, right.x, top.y);
+        stroke(0);
         strokeWeight(1);
     }
 }

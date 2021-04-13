@@ -49,6 +49,7 @@ int endotheliumCount = 20;
 int damagePositionCheck = damagePosition;
 int endotheliumCheck = endotheliumCount;
 int stenosis = 1;
+int rbcAmount = 2;
 float[] a = new float[2];
 float[] b = new float[2];
 float[] c = new float[2];
@@ -112,7 +113,7 @@ void setup() {
             
             
         }
-    });
+    } );
     
     
     // create the background along with the ArrayLists where the particles will be stored in 
@@ -330,10 +331,9 @@ void Physics() {
 void CreateContent() {
     
     // add red blood cells at a random height but at the right of the screen
-    rbcs.add(new Rbc(new PVector(width + 5, random(35,height - 35))));
-    rbcs.add(new Rbc(new PVector(width + 5, random(35,height - 35))));
-    
-    
+    for (int i = 0;i < rbcAmount;i++) {
+        rbcs.add(new Rbc(new PVector(width + 5, random(35,height - 35))));
+    }
     // add platelets every 5 seconds
     if ((millis() / 1000) - currentTime >= 5 && flag == 0) {
         for (int i = 0;i < amounts;i++) {
@@ -349,8 +349,7 @@ void CreateContent() {
     if ((millis() / 1000) - currentTime >= 5 && flag == 1) {
         for (int i = 0;i < amounts;i++) {
             platelets.add(new Platelet(new PVector(width + 5, random(33,50))));
-            platelets.add(new Platelet(new PVector(width + 5, random(height - 33,height - 50))));            
-            
+            platelets.add(new Platelet(new PVector(width + 5, random(height - 33,height - 50))));              
         }
         currentTime = millis() / 1000;
         flag = 0;
@@ -364,8 +363,7 @@ void DeleteContent() {
         BloodCont p = platelets.get(i);
         if (p.cx <= 0 || p.cy >= height  || p.cy <= 0) {
             platelets.remove(i);
-        }
-        
+        }  
     }
     for (int i = rbcs.size() - 1; i>= 0;i--) {
         BloodCont r = rbcs.get(i);
@@ -501,8 +499,8 @@ void controlSetup() {
         group_particles.getCaptionLabel().align(CENTER, CENTER);
         
         sx = 100; px = 10; py = 10;oy = (int)(sy * 1.4f);
-        controlP5.addSlider("platelets generated").setGroup(group_particles).setRange(0, 20).setValue(amounts).setSize(sx,sy).setPosition(px, py).plugTo(this,"amounts");
-        
+        controlP5.addSlider("Platelets generated").setGroup(group_particles).setRange(0, 20).setValue(amounts).setSize(sx,sy).setPosition(px, py).plugTo(this,"amounts");
+        controlP5.addSlider("Red blood cells generated").setGroup(group_particles).setRange(0,20).setValue(rbcAmount).setSize(sx,sy).setPosition(px,py +=oy).plugTo(this,"rbcAmount");
         
         
     }

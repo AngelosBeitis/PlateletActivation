@@ -15,7 +15,6 @@ class Protein extends BloodCont{
         
         pushMatrix();
         fill(0,255,0);
-        
         PShape protein = createShape(GROUP);
         stroke(0);
         protein.addChild(createShape(ELLIPSE,0,0,rad * 2,rad * 2));
