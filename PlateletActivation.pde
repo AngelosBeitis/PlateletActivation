@@ -64,8 +64,8 @@ DwPhysics.Param param_physics = new DwPhysics.Param();
 DwPhysics<DwParticle2D> physics;
 
 void setup() {
-    //size(330,260);
     colorMode(RGB);
+    // used to create the shape in the stenosis simulation
     a[0] = 491;
     a[1] = 99;
     b[0] = 571;
@@ -74,6 +74,7 @@ void setup() {
     c[1] = 99;
     d[0] = 283;
     d[1] = gridSizeY - 30;
+    /////////////////////////////////////////////////////
     controlP5 = new ControlP5(this);
     
     size(840, 340,P2D);
@@ -130,21 +131,7 @@ void setup() {
     bounds[2] = width;
     bounds[3] = height;
     
-    
-    // for (int i = 0;i < 500;i++) {
-    //     rbcs.add(new Rbc(new PVector(random(0,width), random(35,height - 35))));  
-// }
-    // for (int i = 0;i < 5;i++) {
-    //     platelets.add(new Platelet(new PVector(random(0,width), random(height - 35,height - 32.5))));
-    //     platelets.add(new Platelet(new PVector(random(0,width), random(32.5,50))));
-    
-//}   
-    // for (int i = 0; i < 20;i++) {
-    //     float x = random(damage.left.x + 7, damage.right.x - 7);
-    //     float y = damage.top.y;
-    //     proteins.add(new Protein(new PVector(x,y)));
-// }
-    
+      
     pg_fluid = (PGraphics2D) createGraphics(width, height, P2D);
     pg_obstacle = (PGraphics2D) createGraphics(width, height, P2D);
     
@@ -307,7 +294,7 @@ void Physics() {
         
         List<BloodCont> list = new ArrayList<BloodCont>();
         for (int i = 0;i < rbcArray.length;i++) {
-            if (stenosis == 0 || allowCollision == 0) {
+            if (allowCollision == 0) {
                 list.add(rbcArray[i]);
             }
             else{

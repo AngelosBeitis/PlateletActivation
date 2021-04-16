@@ -2,8 +2,8 @@ class Background {
     
     // A flow field is a two dimensional array of PVectors
     
-    int missing;
-    int cells;
+    public int missing;
+    public int cells;
     public PShape sim;
     
     Background(int m,int c) {
@@ -18,7 +18,7 @@ class Background {
     public void display() {
         drawWalls();
     }    
-    void drawWalls() {
+    public void drawWalls() {
         float start = 0;
         float end = width / cells;
         sim = createShape(GROUP);
