@@ -218,7 +218,9 @@ void PlateletMechanics() {
         if (!p.scan(damage) && !p.activated)
             p.scanForProteins();
         
-       
+        //implement shear rate activation
+        if (p.getVelocity()<0.0005 && p.getVelocity()>0) {
+        }
         //generate proteins at the location of activated platelets acting as signaling
         if (frameCount % frame == 0) {
             for (Platelet i : platelets) {

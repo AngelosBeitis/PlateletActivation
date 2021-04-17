@@ -22,13 +22,19 @@ class Platelet extends BloodCont{
         
         float distance = cy - d.top.y;
         distance = distance - this.rad;
-        boolean withinDist = distance < 10;
-        
-        if (withinDist && !this.activated && !this.checkStuck()) {            
+        boolean withinDist = distance < 20;
+        boolean nearDamage;
+        if (cx > d.left.x && cx < d.right.x) {
+            nearDamage = true;
+        }
+        else{
+            nearDamage = false;
+        }
+        if (withinDist && !this.activated && !this.checkStuck() && nearDamage) {            
             float[] cnew = new float[2];
             cnew[0] = cx;
             cnew[1] = d.top.y;
-            moveToTarget(cnew,0.25);
+            moveToTarget(cnew,0.5);
             //activate at the damaged area
             if (distance < 1 && activated == false)
                 activate();
@@ -37,7 +43,7 @@ class Platelet extends BloodCont{
         
     }
     
-    public boolean scanForProteins() {
+    public void scanForProteins() {
         float distance;        
         for (Protein p : proteins) {
             float[] cnew = new float[2];
@@ -45,19 +51,19 @@ class Platelet extends BloodCont{
             cnew[1] = p.cy;
             
             distance = dist(cx,cy,p.cx,p.cy);
-            distance -=(this.rad + p.rad);
-            if (!this.activated && distance < 17) {                
-                moveToTarget(cnew,0.5);
-            }
-            if (distance < 2) {
+            if (distance < 2 && !this.activated) {
                 proteins.remove(p);
-                scanForProteins();
+                //activate();
+                
             }
-            return true;
+            if (!this.activated && distance < 50) {                
+                moveToTarget(cnew,0.5);
+                println("Here");
+                
+            }
             
         }
         
-        return false;
         
     }
     
@@ -130,7 +136,7 @@ class Platelet extends BloodCont{
         boolean statement = false;
         if (this.activated) {                
             statement = true;
-            if (cy > damage.top.y + this.rad) {
+            if (cy <= damage.top.y - this.rad || cy <= 30 - this.rad || cy >= height - 30 + this.rad) {
                 float[] n = new float[2];
                 n[0] = cx;
                 n[1] = damage.top.y;
@@ -150,16 +156,14 @@ class Platelet extends BloodCont{
             // Minimum distance before they are touching
             
             float minDistance = this.rad  + o.rad;
-            if (distanceVectMag < minDistance) {
+            if (distanceVectMag < minDistance && this!= o) {
                 
                 if (this.flag == 0 && o.activated) {
-                    this.time = millis() / 1000;
                     this.flag = 1;
                 }
                 
                 if (!this.activated && o.activated) {
                     this.activate();    
-                    this.time = millis() / 1000;   
                     this.flag = 0;    
                     statement = true;           
                 }
@@ -178,7 +182,6 @@ class Platelet extends BloodCont{
                 this.stuckToPlatelet = false;
                 
                 this.flag = 0;
-                this.time = millis();
             }
             
         }

@@ -3,7 +3,7 @@ class Rbc extends BloodCont{
     public boolean stuck;
     
     Rbc(PVector l) {
-        super(l,2.2);
+        super(l,2.5);
         stuck = false;
         createShapes();
         enableCollisions(true);
