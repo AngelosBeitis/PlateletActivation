@@ -44,28 +44,34 @@ class Platelet extends BloodCont{
     }
     
     public void scanForProteins() {
-        float distance;        
+        float distance;
+        Protein closestProtein = proteins.get(0);
+        float[] cnew = new float[2];
+        float closestDistance =  dist(cx,cy,closestProtein.cx,closestProtein.cy); 
         for (Protein p : proteins) {
-            float[] cnew = new float[2];
             cnew[0] = p.cx;
             cnew[1] = p.cy;
             
             distance = dist(cx,cy,p.cx,p.cy);
-            if (distance < 2 && !this.activated) {
-                proteins.remove(p);
-                //activate();
-                
-            }
-            if (!this.activated && distance < 50) {                
-                moveToTarget(cnew,0.5);
-                println("Here");
-                
+            if (distance < closestDistance) {
+                closestProtein = p;
+                closestDistance = distance;
             }
             
         }
-        
+        cnew[0] = closestProtein.cx;
+        cnew[1] = closestProtein.cy;   
+        if (closestDistance < 30) {
+            if (closestDistance < 2 && !this.activated) {
+                proteins.remove(closestProtein);
+                
+            }
+            
+            moveToTarget(cnew,0.5);
+        }
         
     }
+    
     
     
     public void activate() {

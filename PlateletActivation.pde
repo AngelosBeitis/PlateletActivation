@@ -5,7 +5,7 @@ import com.thomasdiewald.pixelflow.java.fluid.DwFluid2D;
 import com.thomasdiewald.pixelflow.java.softbodydynamics.DwPhysics;
 import com.thomasdiewald.pixelflow.java.softbodydynamics.particle.DwParticle2D;
 ControlP5 controlP5;
-
+PrintWriter file;
 boolean debug = true;
 //no slip condition
 int nsc = 1;
@@ -30,16 +30,16 @@ int stuck = 0;
 int group = 1;
 int displayFluid = 0;
 float fluidSpeed = 1;
-int gridSizeX = 840;
+int gridSizeX = 850;
 int gridSizeY = 200;
-float radius = gridSizeY / 2 -10;
+float radius = gridSizeY / 2;
 float px = gridSizeX + 70;
 float py = gridSizeY / 2;
 float plateletRadius = 1.5;
 float rbcRadius = 2;
 float proteinRadius = 1;
-int damagePosition = 10;
-int endotheliumCount = 20;
+int damagePosition = 7;
+int endotheliumCount = 10;
 int damagePositionCheck = damagePosition;
 int endotheliumCheck = endotheliumCount;
 int stenosis = 1;
@@ -72,7 +72,10 @@ void setup() {
     /////////////////////////////////////////////////////
     controlP5 = new ControlP5(this);
     
-    size(840, 200,P2D);
+    //create file to write the results of the simulation
+    
+    file= createWriter("results.txt");
+    size(850, 200,P2D);
     frameRate(120);
     
     param_physics.GRAVITY = new float[]{0, 0}; //no gravity
@@ -190,13 +193,14 @@ void draw() {
     //display shapes of the screen
     damage.display();
     shape(simulationShapes);  
-    if (frameCount == 1836) {
-        print("Stuck: " + stuck + "\n");
-        print("Activated: " + getActivated() + "\n");
-        print("Proteins:" + proteins.size() + "\n");
-        print("Platelets:" + platelets.size() + "\n");
-        print("red blood cells:" + rbcs.size() + "\n");
-    }
+    if(frameCount % frame ==0){
+         file.print("Stuck: " + stuck + "\n");
+         file.print("Activated: " + getActivated() + "\n");
+         file.print("Proteins:" + proteins.size() + "\n");
+         file.print("Platelets:" + platelets.size() + "\n");
+         file.print("red blood cells:" + rbcs.size() + "\n");
+         file.println("Frame:" + frameCount + "\n");
+      }
     
 }
 
@@ -222,7 +226,7 @@ void PlateletMechanics() {
         //generate proteins at the location of activated platelets acting as signaling
         if (frameCount % frame == 0) {
             for (Platelet i : platelets) {
-                if (i.activated && proteins.size()<1000) {
+                if (i.activated) {
                     for (int j = 0;j < 1;j++) {
                         proteins.add(new Protein(new PVector(i.cx,i.cy)));
                     }
@@ -321,9 +325,13 @@ void PlateletMechanics() {
             for (int i = 0;i < amounts;i++) {
                 platelets.add(new Platelet(new PVector(width + 5, random(33,50))));
                 platelets.add(new Platelet(new PVector(width + 5, random(height - 33,height - 50))));
-                float x = random(damage.left.x + 7, damage.right.x - 7);
-                float y = damage.top.y + proteinRadius;
-                proteins.add(new Protein(new PVector(x,y)));
+                
+                
+            }
+            if(proteins.size()<1000){
+              float x = random(damage.left.x + 7, damage.right.x - 7);
+              float y = damage.top.y + proteinRadius;
+              proteins.add(new Protein(new PVector(x,y)));
             }
            
         }
@@ -369,13 +377,12 @@ void PlateletMechanics() {
    }
    
    void mouseClicked() {
-       
-       print("Stuck: " + stuck + "\n");
-       print("Activated: " + getActivated() + "\n");
-       print("Proteins:" + proteins.size() + "\n");
-       print("Platelets:" + platelets.size() + "\n");
-       print("red blood cells:" + rbcs.size() + "\n");
-       
+         print("Stuck: " + stuck + "\n");
+         print("Activated: " + getActivated() + "\n");
+         print("Proteins:" + proteins.size() + "\n");
+         print("Platelets:" + platelets.size() + "\n");
+         print("red blood cells:" + rbcs.size() + "\n");
+         print("Frame:" + frameCount + "\n");
        //println(mouseX + " " + mouseY);
        
        
@@ -389,18 +396,18 @@ void PlateletMechanics() {
        
        int sx, sy, px, py, oy;
        
-       sx = 100; sy = 14; oy = (int)(sy * 1.5f);
+       sx = 100; sy = 14; oy = (int)(sy * 1.2f);
        ////////////////////////////////////////////////////////////////////////////
        // GUI - SIMULATION
        ////////////////////////////////////////////////////////////////////////////
        Group group_simulation = controlP5.addGroup("Simulation");
     {
-           px = 10; py = 15;
+           px = 10; py = 10;
            group_simulation.setHeight(20).setSize(gui_w, 140)
              .setBackgroundColor(color(16, 180)).setColorBackground(color(16, 180));
            group_simulation.getCaptionLabel().align(CENTER, CENTER);
            
-           controlP5.addSlider("endothelium cells").setGroup(group_simulation).setSize(sx, sy).setPosition(px, py - 10)
+           controlP5.addSlider("endothelium cells").setGroup(group_simulation).setSize(sx, sy).setPosition(px, py )
              .setRange(damagePosition, 20).setValue(endotheliumCount).plugTo(this,"endotheliumCount");    
            controlP5.addSlider("damaged position").setGroup(group_simulation).setSize(sx, sy).setPosition(px, py +=oy)
              .setRange(1, endotheliumCount).setValue(damagePosition).plugTo(this,"damagePosition");            
@@ -413,7 +420,8 @@ void PlateletMechanics() {
            controlP5.addRadio("particleCollision").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
              .addItem("Particle collision",0)
              .activate(allowCollision);
-           
+           controlP5.addRadio("stopSimulation").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
+             .addItem("Stop simulation",0);
        }
        ////////////////////////////////////////////////////////////////////////////
        // GUI - FLUID
@@ -507,7 +515,10 @@ void PlateletMechanics() {
    void stenosiSimulation(int i) {
        stenosis = i;
        back = new Background(damagePosition,endotheliumCount);
-       
-       
+   }
+   void stopSimulation(int i){
+     file.flush();
+     file.close();
+     exit();
    }
    

@@ -4,7 +4,7 @@ class Protein extends BloodCont{
         
         super(l,1);   
         ax = 0;
-        ay = 0;   
+        ay = 0.05;   
         // will make them stay close to the damaged area
         //mass = 2;
         enableCollisions(false);        
