@@ -30,7 +30,7 @@ class Platelet extends BloodCont{
         else{
             nearDamage = false;
         }
-        if (withinDist && !this.activated && !this.checkStuck() && nearDamage) {            
+        if (withinDist && !this.activated && (!this.stuckToWall && !this.stuckToPlatelet) && nearDamage) {            
             float[] cnew = new float[2];
             cnew[0] = cx;
             cnew[1] = d.top.y;
@@ -141,15 +141,21 @@ class Platelet extends BloodCont{
     public boolean checkStuck() {
         boolean statement = false;
         if (this.activated) {                
-            statement = true;
-            if (cy <= damage.top.y - this.rad || cy <= 30 - this.rad || cy >= height - 30 + this.rad) {
+            if (cy <= damage.top.y + this.rad * 2) {
+                statement = true;
                 float[] n = new float[2];
                 n[0] = cx;
                 n[1] = damage.top.y;
                 this.stuckToWall = true;
-                this.moveTo(n,0.005);
+                cx = px;
+                cy = py;
+                return true;
+            }
+            else{
+                this.stuckToWall = false;
             }
         }
+        
         for (Platelet o : platelets) {
             // Get distances between the balls components
             PVector otherPosition = new PVector(o.cx,o.cy);
@@ -162,31 +168,37 @@ class Platelet extends BloodCont{
             // Minimum distance before they are touching
             
             float minDistance = this.rad  + o.rad;
-            if (distanceVectMag < minDistance && this!= o) {
+            if (distanceVectMag < minDistance && position!= otherPosition) {
                 
                 if (this.flag == 0 && o.activated) {
                     this.flag = 1;
                 }
                 
-                if (!this.activated && o.activated) {
+                if (!this.activated && o.activated && (o.stuckToWall || o.stuckToPlatelet)) {
                     this.activate();    
                     this.flag = 0;    
                     statement = true;           
                 }
                 if ((o.activated && !this.activated) || (this.activated && o.activated && !this.stuckToWall)) {
+                    println("Here");
                     float[] newo = new float[2];
                     newo[0] = o.cx;
                     newo[1] = o.cy;
-                    this.moveToTarget(newo,0.5);
+                    cx = px;
+                    cy = py;
+                    
                     this.stuckToPlatelet = true;
-                    return statement;
+                    return true;
+                    
+                }
+                else{
+                    this.stuckToPlatelet = false;
                     
                 }
                 
             }
             else{
                 this.stuckToPlatelet = false;
-                
                 this.flag = 0;
             }
             
@@ -194,4 +206,39 @@ class Platelet extends BloodCont{
         return statement;
     }
     
+    public boolean checkStuck2() {
+        
+        for (Platelet o : platelets) {
+            // Get distances between the balls components
+            PVector otherPosition = new PVector(o.cx,o.cy);
+            PVector position = new PVector(cx,cy);
+            PVector distanceVect = PVector.sub(otherPosition, position);
+            
+            // Calculate magnitude of the vector separating the balls
+            float distanceVectMag = distanceVect.mag();
+            
+            // Minimum distance before they are touching
+            
+            float minDistance = this.rad  + o.rad;
+            if (distanceVectMag < minDistance && position!= otherPosition) {
+                
+                if (!this.activated && o.activated && (o.stuckToWall || o.stuckToPlatelet) && this.withinDamage()) {
+                    this.activate(); 
+                }
+            }
+        }
+        if (this.activated) {                
+            if (cy < damage.bottom.y + this.rad) {
+                float[] n = new float[2];
+                n[0] = cx;
+                n[1] = damage.top.y;
+                this.stuckToWall = true;
+                this.moveTo(n,0.005);
+                returntrue;
+            }
+            
+        }
+        return false;
+        
+    }
 }

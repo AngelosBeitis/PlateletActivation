@@ -32,7 +32,7 @@ int displayFluid = 0;
 float fluidSpeed = 1;
 int gridSizeX = 850;
 int gridSizeY = 200;
-float radius = gridSizeY / 2;
+float radius = gridSizeY / 2-10;
 float px = gridSizeX + 70;
 float py = gridSizeY / 2;
 float plateletRadius = 1.5;
@@ -50,7 +50,8 @@ float[] b = new float[2];
 float[] c = new float[2];
 float[] d = new float[2];
 int frame = 100;
-
+int obstaclesSimulation =1;
+int methods = 0;
 //PShape shapePlatelets;
 PGraphics2D pg_obstacle;
 
@@ -71,7 +72,6 @@ void setup() {
     d[1] = gridSizeY - 30;
     /////////////////////////////////////////////////////
     controlP5 = new ControlP5(this);
-    
     //create file to write the results of the simulation
     
     file= createWriter("results.txt");
@@ -135,7 +135,12 @@ void setup() {
     
     controlSetup();
     
-    
+    file.print("Stuck ");
+    file.print("Activated ");
+    file.print("Proteins ");
+    file.print("Platelets ");
+    file.print("red blood cells ");
+    file.println("Frame");
     
     
 }
@@ -194,12 +199,12 @@ void draw() {
     damage.display();
     shape(simulationShapes);  
     if(frameCount % frame ==0){
-         file.print("Stuck: " + stuck + "\n");
-         file.print("Activated: " + getActivated() + "\n");
-         file.print("Proteins:" + proteins.size() + "\n");
-         file.print("Platelets:" + platelets.size() + "\n");
-         file.print("red blood cells:" + rbcs.size() + "\n");
-         file.println("Frame:" + frameCount + "\n");
+         file.print(stuck + " ");
+         file.print( getActivated() + " ");
+         file.print(proteins.size() + " ");
+         file.print(platelets.size() + " ");
+         file.print(rbcs.size() + " ");
+         file.println(frameCount + " ");
       }
     
 }
@@ -216,26 +221,18 @@ void PlateletMechanics() {
     }
     for (Platelet p : platelets) {
         //add activated platelets to the obstacle so that we can see flow dissruption
-        if (p.activated && (p.stuckToPlatelet || p.stuckToWall)) {
+        if (p.activated && (p.stuckToPlatelet || p.stuckToWall) && obstaclesSimulation ==0) {
             obstacles.addChild(p.getShape());
         }
         if (!p.scan(damage) && !p.activated)
+          if(proteins.size()>0){
             p.scanForProteins();
-        
-       
-        //generate proteins at the location of activated platelets acting as signaling
-        if (frameCount % frame == 0) {
-            for (Platelet i : platelets) {
-                if (i.activated) {
-                    for (int j = 0;j < 1;j++) {
-                        proteins.add(new Protein(new PVector(i.cx,i.cy)));
-                    }
-                }
-            }
-        }
-        
+          }
         p.checkBoundary();
-        p.checkStuck();
+        if(methods==0)
+          p.checkStuck();
+        else
+          p.checkStuck2();
         p.update(fluid_velocity);
         simulationShapes.addChild(p.getShape());
     }
@@ -328,12 +325,22 @@ void PlateletMechanics() {
                 
                 
             }
-            if(proteins.size()<1000){
+            if(proteins.size()<1000 && frameCount % 500 ==0){
               float x = random(damage.left.x + 7, damage.right.x - 7);
               float y = damage.top.y + proteinRadius;
               proteins.add(new Protein(new PVector(x,y)));
             }
            
+        }
+        //generate proteins at the location of activated platelets acting as signaling
+        if (frameCount % 300 == 0) {
+            for (Platelet i : platelets) {
+                if (i.activated) {
+                    for (int j = 0;j < 1;j++) {
+                        proteins.add(new Protein(new PVector(i.cx,i.cy)));
+                    }
+                }
+            }
         }
        
        
@@ -389,9 +396,9 @@ void PlateletMechanics() {
    }
    
    void controlSetup() {
-       int gui_w = 200;
-       int gui_x = 20;
-       int gui_y = 20;
+       int gui_w = 250;
+       int gui_x = 0;
+       int gui_y = 0;
        
        
        int sx, sy, px, py, oy;
@@ -420,8 +427,11 @@ void PlateletMechanics() {
            controlP5.addRadio("particleCollision").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
              .addItem("Particle collision",0)
              .activate(allowCollision);
+           controlP5.addRadio("obstaclesFlowSimulation").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
+             .addItem("Flow obstacle simulation",0);
            controlP5.addRadio("stopSimulation").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
              .addItem("Stop simulation",0);
+           
        }
        ////////////////////////////////////////////////////////////////////////////
        // GUI - FLUID
@@ -483,7 +493,8 @@ void PlateletMechanics() {
            
            sx = 100; px = 10; py = 10;oy = (int)(sy * 1.4f);
            controlP5.addSlider("Platelets generated").setGroup(group_particles).setRange(0, 20).setValue(amounts).setSize(sx,sy).setPosition(px, py).plugTo(this,"amounts");
-           controlP5.addSlider("Red blood cells generated").setGroup(group_particles).setRange(0,20).setValue(rbcAmount).setSize(sx,sy).setPosition(px,py +=oy).plugTo(this,"rbcAmount");
+           controlP5.addSlider("Red blood cells generated").setGroup(group_particles).setRange(0,500).setValue(rbcAmount).setSize(sx,sy).setPosition(px,py +=oy).plugTo(this,"rbcAmount");
+           controlP5.addSlider("Sticking method").setGroup(group_particles).setRange(0,1).setValue(methods).setSize(sx,sy).setPosition(px,py +=oy).plugTo(this,"methods");
            
            
        }
@@ -521,4 +532,8 @@ void PlateletMechanics() {
      file.close();
      exit();
    }
+   void obstacleFlowSimulation(int i){
+     obstaclesSimulation = i;
+   }
+   
    
