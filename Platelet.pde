@@ -234,7 +234,7 @@ class Platelet extends BloodCont{
                 n[1] = damage.top.y;
                 this.stuckToWall = true;
                 this.moveTo(n,0.005);
-                returntrue;
+                return true;
             }
             
         }
