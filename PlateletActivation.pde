@@ -38,7 +38,7 @@ float py = gridSizeY / 2;
 float plateletRadius = 1.5;
 float rbcRadius = 2;
 float proteinRadius = 1;
-int damagePosition = 7;
+int damagePosition = 5;
 int endotheliumCount = 10;
 int damagePositionCheck = damagePosition;
 int endotheliumCheck = endotheliumCount;
@@ -50,7 +50,7 @@ float[] b = new float[2];
 float[] c = new float[2];
 float[] d = new float[2];
 int frame = 100;
-int obstaclesSimulation =1;
+int obstaclesSimulation = 0;
 int methods = 0;
 //PShape shapePlatelets;
 PGraphics2D pg_obstacle;
@@ -136,9 +136,10 @@ void setup() {
     controlSetup();
     
     file.print("Stuck ");
-    file.print("Activated ");
+    file.print("Activated Platelets ");
+    file.print("All Platelets ");
+    file.print("Innactive Platelets ");
     file.print("Proteins ");
-    file.print("Platelets ");
     file.print("red blood cells ");
     file.println("Frame");
     
@@ -199,12 +200,14 @@ void draw() {
     damage.display();
     shape(simulationShapes);  
     if(frameCount % frame ==0){
-         file.print(stuck + " ");
-         file.print( getActivated() + " ");
-         file.print(proteins.size() + " ");
-         file.print(platelets.size() + " ");
-         file.print(rbcs.size() + " ");
-         file.println(frameCount + " ");
+        file.print(stuck + " ");
+        file.print( getActivated() + " ");
+        file.print(platelets.size() + " ");
+        file.print(platelets.size() - getActivated() + " ");
+        file.print(proteins.size() + " ");
+        file.print(rbcs.size() + " ");
+        file.println(frameCount + " ");
+        
       }
     
 }
@@ -221,7 +224,7 @@ void PlateletMechanics() {
     }
     for (Platelet p : platelets) {
         //add activated platelets to the obstacle so that we can see flow dissruption
-        if (p.activated && (p.stuckToPlatelet || p.stuckToWall) && obstaclesSimulation ==0) {
+        if (p.activated && (p.stuckToPlatelet || p.stuckToWall) && obstaclesSimulation == 0) {
             obstacles.addChild(p.getShape());
         }
         if (!p.scan(damage) && !p.activated)
@@ -390,7 +393,6 @@ void PlateletMechanics() {
          print("Platelets:" + platelets.size() + "\n");
          print("red blood cells:" + rbcs.size() + "\n");
          print("Frame:" + frameCount + "\n");
-       //println(mouseX + " " + mouseY);
        
        
    }
@@ -427,8 +429,9 @@ void PlateletMechanics() {
            controlP5.addRadio("particleCollision").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
              .addItem("Particle collision",0)
              .activate(allowCollision);
-           controlP5.addRadio("obstaclesFlowSimulation").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
-             .addItem("Flow obstacle simulation",0);
+           controlP5.addRadio("obstacleFlowSimulation").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
+             .addItem("Flow obstacle simulation",0)
+             .activate(obstaclesSimulation);
            controlP5.addRadio("stopSimulation").setGroup(group_simulation).setSize(39, 18).setPosition(px, py += oy)
              .addItem("Stop simulation",0);
            

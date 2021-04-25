@@ -180,7 +180,6 @@ class Platelet extends BloodCont{
                     statement = true;           
                 }
                 if ((o.activated && !this.activated) || (this.activated && o.activated && !this.stuckToWall)) {
-                    println("Here");
                     float[] newo = new float[2];
                     newo[0] = o.cx;
                     newo[1] = o.cy;
@@ -228,7 +227,7 @@ class Platelet extends BloodCont{
             }
         }
         if (this.activated) {                
-            if (cy < damage.bottom.y + this.rad) {
+            if (this.withinDamage()) {
                 float[] n = new float[2];
                 n[0] = cx;
                 n[1] = damage.top.y;
