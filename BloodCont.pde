@@ -12,7 +12,15 @@ abstract class BloodCont extends DwParticle2D{
     }
     
     public float[] fluidVelocity(float[] fluid_velocity) {
+        /***************************************************************************************
+        *    Title: Fluid_VerletParticleCollisionSystem
+        *    Author: diwi
+        *    Date: 7/10/2017
+        *    Availability: https://github.com/diwi/PixelFlow/tree/master/examples/Fluid2D/Fluid_VerletParticleCollisionSystem
+        *
+        ***************************************************************************************/
         // add force: Fluid Velocity
+        
         float[] fluid_vxy = new float[2];
         
         int px_view = Math.round(this.cx);
@@ -33,6 +41,7 @@ abstract class BloodCont extends DwParticle2D{
         fluid_vxy[1] = - fluid_velocity[PIDX * 2 + 1] * 0.05f * fluidSpeed; // invert y
         
         return fluid_vxy;
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
     // Method to update position
     public void update(float[] fluid_velocity) {
@@ -112,12 +121,9 @@ abstract class BloodCont extends DwParticle2D{
     public void moveToTarget(float[] cnew, float m) {
         PVector position = new PVector(cx,cy);
         PVector target = new PVector(cnew[0],cnew[1]);
-        //float distance = dist(this.cx,this.cy,cnew[0],cnew[1]);
         PVector desired = PVector.sub(target,position);
-        //float d = desired.mag();
         desired.normalize();
-        // PVector newV = new PVector(0.05,0.05);
-        // desired.sub(newV);
+        
         desired.mult(m);
         
         PVector steer = PVector.sub(desired,velocity);

@@ -50,8 +50,8 @@ float[] b = new float[2];
 float[] c = new float[2];
 float[] d = new float[2];
 int frame = 100;
-int obstaclesSimulation = 0;
-int methods = 0;
+int obstaclesSimulation = 1;
+int methods = 1;
 //PShape shapePlatelets;
 PGraphics2D pg_obstacle;
 
@@ -74,7 +74,7 @@ void setup() {
     controlP5 = new ControlP5(this);
     //create file to write the results of the simulation
     
-    file= createWriter("results.txt");
+    file = createWriter("results_" +day() +"_" + month() + "_" + year() + "_" + hour()+"_"+minute()+"_"+second()+"_"+".csv");
     size(850, 200,P2D);
     frameRate(120);
     
@@ -135,13 +135,13 @@ void setup() {
     
     controlSetup();
     
-    file.print("Stuck ");
-    file.print("Activated Platelets ");
-    file.print("All Platelets ");
-    file.print("Innactive Platelets ");
-    file.print("Proteins ");
-    file.print("red blood cells ");
-    file.println("Frame");
+    file.print("Stuck, " );
+    file.print("Activated Platelets, ");
+    file.print("All Platelets, ");
+    file.print("Innactive Platelets, ");
+    file.print("Proteins, ");
+    file.print("red blood cells, ");
+    file.println("Frame,");
     
     
 }
@@ -200,13 +200,13 @@ void draw() {
     damage.display();
     shape(simulationShapes);  
     if(frameCount % frame ==0){
-        file.print(stuck + " ");
-        file.print( getActivated() + " ");
-        file.print(platelets.size() + " ");
-        file.print(platelets.size() - getActivated() + " ");
-        file.print(proteins.size() + " ");
-        file.print(rbcs.size() + " ");
-        file.println(frameCount + " ");
+        file.print(stuck + ", ");
+        file.print( getActivated() + ", ");
+        file.print(platelets.size() + ", ");
+        file.print(platelets.size() - getActivated() + ", ");
+        file.print(proteins.size() + ", ");
+        file.print(rbcs.size() + ", ");
+        file.println(frameCount + ", ");
         
       }
     
@@ -239,6 +239,7 @@ void PlateletMechanics() {
         p.update(fluid_velocity);
         simulationShapes.addChild(p.getShape());
     }
+    
 }
    
    
