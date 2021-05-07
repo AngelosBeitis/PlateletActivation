@@ -54,7 +54,7 @@ abstract class BloodCont extends DwParticle2D{
         updatePosition(1);
         
     }
-    
+    // this function created the boundaries around the endothelium cells
     public void checkBoundary() {
         if (stenosis == 0) {
             float alpha = (a[1] - b[1]) / (a[0] - b[0]);
@@ -118,6 +118,7 @@ abstract class BloodCont extends DwParticle2D{
         
         
     }
+    //This function will allow particles to move towards a certain position with a force denoted by m
     public void moveToTarget(float[] cnew, float m) {
         PVector position = new PVector(cx,cy);
         PVector target = new PVector(cnew[0],cnew[1]);

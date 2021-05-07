@@ -42,31 +42,29 @@ class Platelet extends BloodCont{
         return withinDist;
         
     }
-    
+    // This method scans for the nearest protein and moves the platelet towards it
     public void scanForProteins() {
         float distance;
         Protein closestProtein = proteins.get(0);
         float[] cnew = new float[2];
-        float closestDistance =  dist(cx,cy,closestProtein.cx,closestProtein.cy); 
+        float closestDistance =  dist(cx,cy,closestProtein.cx,closestProtein.cy);
+        
+        //Find nearest protein
         for (Protein p : proteins) {
             cnew[0] = p.cx;
-            cnew[1] = p.cy;
-            
+            cnew[1] = p.cy;            
             distance = dist(cx,cy,p.cx,p.cy);
             if (distance < closestDistance) {
                 closestProtein = p;
                 closestDistance = distance;
-            }
-            
+            }  
         }
         cnew[0] = closestProtein.cx;
         cnew[1] = closestProtein.cy;   
         if (closestDistance < 30) {
             if (closestDistance < 2 && !this.activated) {
-                proteins.remove(closestProtein);
-                
-            }
-            
+                proteins.remove(closestProtein);    
+            } 
             moveToTarget(cnew,0.5);
         }
         
@@ -79,9 +77,8 @@ class Platelet extends BloodCont{
         this.setRadius(2);
         //create the new shape
         createShapes();
-        //plug.addShape(this.getShape());     
     }
-    
+    //Create chapes of platelets
     private void createShapes() {
         if (!activated) {
             stroke(0);
@@ -95,11 +92,11 @@ class Platelet extends BloodCont{
             popMatrix();
         }
         else{
+            //Create shapes of activated platelets
             stroke(0);
             
             pushMatrix();
             fill(255);
-            //translate(cx,cy);
             PShape platelet = createShape(GROUP);
             
             // Make 4shapes
